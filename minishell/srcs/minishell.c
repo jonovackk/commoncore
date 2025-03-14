@@ -13,6 +13,8 @@ int	is_non_empty(const char *str)
 		tmp++;
 	return (*tmp != '\0');
 }
+
+//Verify if its needed or not this is to display intro logo.
 void display_logo(t_envvar *env)
 {
     t_envvar *logo_var;
@@ -86,3 +88,54 @@ int main(int argc, char **argv, char **envp)
     }
     return (EXIT_SUCCESS);
 }
+
+
+/*In-Depth Function Analysis
+1. is_non_empty(const char *str)
+This function performs a robust check to determine if a string contains any 
+non-whitespace characters. Key characteristics include:
+
+Handles NULL and empty string inputs by returning 0
+Skips leading whitespace characters
+Uses a pointer traversal method for efficiency
+Returns 1 if any non-whitespace character is found, 0 otherwise
+Useful for validating input strings before further processing
+
+2. display_logo(t_envvar *env)
+A specialized function for displaying a welcome logo in the shell:
+
+Retrieves logo file path from environment variables
+Uses color formatting for visual appeal (green text)
+Implements a line-by-line display with a small delay for dramatic effect
+Gracefully handles cases where logo path is not set or file cannot be opened
+Provides a welcoming visual element to the shell interface
+
+3. generate_temp_filename(const char *prefix, int length)
+Creates a unique temporary filename with robust randomness:
+
+Utilizes /dev/urandom for cryptographically secure random byte generation
+Converts random bytes to alphanumeric characters
+Joins a prefix with random characters to create a unique filename
+Handles memory allocation and error cases
+Useful for creating temporary files with low collision probability
+
+4. main(int argc, char **argv, char **envp)
+The core entry point of the minishell application:
+
+Disables readline's default signal handling
+Prevents command-line arguments (pure interactive shell)
+Initializes environment variables
+Displays a welcome logo
+Sets up signal handlers
+Enters an infinite loop for continuous shell operation
+Manages environment updates and command processing
+Provides a clean, structured shell startup process
+
+Overall Design Observations
+
+Strong error handling
+Modular function design
+Use of custom utility functions (likely from a custom library)
+Focus on security and user experience
+Implements a typical shell loop with environment management
+*/
