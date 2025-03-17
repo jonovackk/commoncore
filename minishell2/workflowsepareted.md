@@ -86,11 +86,11 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 2: Advanced Parsing (35 hours)
 **Files:**
-- `ft_token_auth.c`  (pasta shell_parsing)  -->     ps_token_validator.c
-- `ft_parse_quotes.c`(pasta shell_parsing) -->      ps_quotes.c
-- `s_node.c`         (pasta sheel_data_struct) -->  dt_node.c  
-- `ft_exec_command.c`(pasta shell_execs)     -->    ex_command.c
-- `s_executer.c`     (pasta shell_data_struct) -->  dt_exec.c
+- `ft_token_auth.c`
+- `ft_parse_quotes.c` (pasta shell_parsing) -->    dt_quotes.c
+- `s_node.c`
+- `ft_exec_command.c`
+- `s_executer.c`
 
 **Objectives:**
 - Complete tokenization system
@@ -99,9 +99,9 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 3: Variable and Environment Processing (40 hours)
 **Files:**
-- `ft_parse_dollars.c`  (pasta shell_parsing) --> ps_expand_env_vars.c
-- `ft_parse_wildcards.c`(past shell parsing)  --> ps_wildcards.c
-- `ft_setup_env.c`	(pasta)
+- `ft_parse_dollars.c`
+- `ft_parse_wildcards.c`
+- `ft_setup_env.c`
 - `s_envvar_utils.c`
 - `ft_manage_commands.c`
 
