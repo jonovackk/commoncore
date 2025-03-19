@@ -101,9 +101,9 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 **Files:**
 - `ft_parse_dollars.c`  (pasta shell_parsing) --> ps_expand_env_vars.c
 - `ft_parse_wildcards.c`(past shell parsing)  --> ps_wildcards.c
-- `ft_setup_env.c`	(pasta)
-- `s_envvar_utils.c`
-- `ft_manage_commands.c`
+- `ft_setup_env.c`	(pasta utils)             --> setup_env.c
+- `s_envvar_utils.c` (pasta shell_data_struct)--> dt_variables_utils.c
+- `ft_manage_commands.c` (pasta shell_execs ) --> command_processor.c
 
 **Objectives:**
 - Implement variable expansion
@@ -113,12 +113,12 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 4: Built-in Commands Part 1 (35 hours)
 **Files:**
-- `ft_echo.c`
-- `ft_cd.c`
-- `ft_pwd.c`
-- `ft_exit.c`
-- `ft_exec_builtins.c`
-- `ft_manage_files.c`
+- `ft_echo.c` OK
+- `ft_cd.c`   OK
+- `ft_pwd.c`  OK
+- `ft_exit.c` OK
+- `ft_exec_builtins.c` OK
+- `ft_manage_files.c` OK 
 
 **Objectives:**
 - Implement core built-in commands
