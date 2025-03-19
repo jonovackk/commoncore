@@ -96,6 +96,37 @@ int            count_chars_without_quotes(char *str);
  * 
  * @return			Syntax error char.		
 */
-t_qstate    quote_error(char *line, char *end_marker, t_qstate state)
+t_qstate    quote_error(char *line, char *end_marker, t_qstate state);
+
+void    process_wildcard_token(t_sh_token **token_list, t_sh_token **current);
+
+char    **wildcard_files(char *pattern);
+
+int     match_wildcard(const char *fname, const char *pattern);
+
+int     check_subtoken_validity(t_sh_token *token);
+
+int     validate_token_sequence(t_sh_token *token, char **err_token);
+
+int     check_bracket_balance(t_sh_token *tokens);
+
+int     verify_tokens(t_sh_token *tokens, char **err_token);
+
+int     validate_binop_in_brackets(t_sh_token *token);
+
+void enforce_quotes(char **line, int tmp_fd, t_qstate state);
+
+void remove_quotes(char **line, t_qstate state);
+
+int     calc_var_length(char *str);
+
+void    skip_quotes(char **s, int *rem, t_qstate *state);
+
+void    insert_env_variable(t_sh_env *env, char *s, char ***res_parts, t_qstate state);
+
+void     replace_env_vars(t_sh_env *env, char **line, t_qstate state)
+
+
+
 
 #endif

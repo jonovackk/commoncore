@@ -38,7 +38,7 @@ int     validate_token_sequence(t_sh_token *token, char **err_token)
     }
     return (token->type & (TOKEN_PARENTHESIS | TOKEN_TEXT));
 }
-int     check_bracket_balance(t_token *tokens)
+int     check_bracket_balance(t_sh_token *tokens)
 {
     int     balance;
 
@@ -56,7 +56,7 @@ int     check_bracket_balance(t_token *tokens)
     return (balance == 0);
 }
 
-int     verify_tokens(t_token *tokens, char **err_token)
+int     verify_tokens(t_sh_token *tokens, char **err_token)
 {
     t_sh_token  *current;
     int         here_doc_count;
@@ -73,7 +73,7 @@ int     verify_tokens(t_token *tokens, char **err_token)
     }
     if (here_doc_count > 16)
         return (0b100);
-    return (ERR_NOERRS);
+    return (ERR_NONE);
 }
 
 int     validate_binop_in_brackets(t_sh_token *token)

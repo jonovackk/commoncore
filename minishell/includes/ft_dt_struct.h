@@ -424,4 +424,15 @@ void    sh_del_node(t_sh_node *tree);
 void    sh_clear_tree(t_sh_node *tree);
 
 
+
+void    attach_parent(t_sh_node **root, t_sh_node *new_parent, int pos);
+
+void    attach_child(t_sh_node **root, t_sh_node *child, int pos);
+
+void    merge_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok);
+
+void        delete_node(t_sh_node *node);
+
+void        clear_tree(t_sh_node *node);
+
 #endif

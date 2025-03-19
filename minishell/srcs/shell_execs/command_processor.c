@@ -63,7 +63,7 @@ void    update_command_path(t_sh_cmd *cmd)
         cmd->executable = sh_get_path(*cmd->arguments, *(cmd->environment));
 }
 
-t_error     prepare_command(t_sh_cmd *cmd)
+error_t     prepare_command(t_sh_cmd *cmd)
 {
     char    **tmp;
 
@@ -82,7 +82,7 @@ t_error     prepare_command(t_sh_cmd *cmd)
     return (ERR_NONE);
 }
 
-t_error     handle_heredocs(t_sh_node *nd, int *nd, int *hd)
+error_t     handle_heredocs(t_sh_node *nd, int *nd, int *hd)
 {
     t_error     err;
 

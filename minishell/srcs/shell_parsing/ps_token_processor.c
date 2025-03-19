@@ -15,7 +15,7 @@ int     is_valid_operator(char *input, t_qstate qstat)
     return (ft_strlen(*current));
 }
 
-t_token_type    get_token_category(char *input, t_qstate qstat)
+t_token_kind    get_token_category(char *input, t_qstate qstat)
 {
     if (qstat != QT_NONE)
         return (TOKEN_TEXT);
