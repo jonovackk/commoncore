@@ -72,12 +72,12 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 1: Core Structures (35 hours)
 **Files:**
-- `constructors.c` (pasta shell_data_struct) -->   dt_builders.c
-- `s_token.c` (pasta shell_data_struct) -->        dt_token.c
-- `s_envvar.c` (pasta shell_data_struct) -->       dt_variables.c
-- `ft_tokenizer.c` (pasta shell_parsing) -->       ps_token_processor.c
-- `ft_parsing_utils.c` (pasta shell_parsing) -->   ps_quote_handler.c
-- `s_command.c` (pasta shell_data_struct) -->      dt_command.c
+- `constructors.c`     (dir. sh_managers)      -->   sh_create_m.c
+- `s_token.c`          (dir. sh_managers)      -->   sh_token_m.c
+- `s_envvar.c`         (dir. sh_managers)      -->   sh_envvar_m.c
+- `ft_tokenizer.c`     (dir. sh_input_parser)  -->   sh_input_tokenizer.c
+- `ft_parsing_utils.c` (dir. sh_input_parser)  -->   sh_psng_help.c.c
+- `s_command.c`        (dir. sh_managers)      -->   sh_cmd_m.c
 
 **Objectives:**
 - Develop core data structures
@@ -86,11 +86,11 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 2: Advanced Parsing (35 hours)
 **Files:**
-- `ft_token_auth.c`  (pasta shell_parsing)  -->     ps_token_validator.c
-- `ft_parse_quotes.c`(pasta shell_parsing) -->      ps_quotes.c
-- `s_node.c`         (pasta sheel_data_struct) -->  dt_node.c  
-- `ft_exec_command.c`(pasta shell_execs)     -->    ex_command.c
-- `s_executer.c`     (pasta shell_data_struct) -->  dt_exec.c
+- `ft_token_auth.c`   (dir. sh_input_parser)  -->   sh_token_valid.c
+- `ft_parse_quotes.c` (dir. sh_input_parser)  -->   sh_quote_procs.c
+- `s_node.c`          (dir. sh_managers)      -->   sh_node_m.c
+- `ft_exec_command.c` (dir. sh_operators)     -->   sh_exec_cmd_ops.c
+- `s_executer.c`      (dir. sh_managers)      -->   sh_exec_m.c
 
 **Objectives:**
 - Complete tokenization system
@@ -99,11 +99,11 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 3: Variable and Environment Processing (40 hours)
 **Files:**
-- `ft_parse_dollars.c`  (pasta shell_parsing) --> ps_expand_env_vars.c
-- `ft_parse_wildcards.c`(past shell parsing)  --> ps_wildcards.c
-- `ft_setup_env.c`	(pasta utils)             --> setup_env.c
-- `s_envvar_utils.c` (pasta shell_data_struct)--> dt_variables_utils.c
-- `ft_manage_commands.c` (pasta shell_execs ) --> command_processor.c
+- `ft_parse_dollars.c`    (dir. sh_input_parser)   --> sh_var_expand.c
+- `ft_parse_wildcards.c`  (dir. sh_input_parser)   --> sh_wildcard_matcher.c
+- `ft_setup_env.c`	  (dir. sh_utils)          --> sh_env_setup.c
+- `s_envvar_utils.c`      (dir. sh_managers)       --> sh_envvar_utils_m.c
+- `ft_manage_commands.c`  (dir. sh_operators)      --> sh_cmd_ops.c
 
 **Objectives:**
 - Implement variable expansion
@@ -113,12 +113,12 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 4: Built-in Commands Part 1 (35 hours)
 **Files:**
-- `ft_echo.c` OK
-- `ft_cd.c`   OK
-- `ft_pwd.c`  OK
-- `ft_exit.c` OK
-- `ft_exec_builtins.c` OK
-- `ft_manage_files.c` OK 
+- `ft_echo.c` 		   (dir. sh_handler)   --> sh_echo_h.c
+- `ft_cd.c`   		   (dir. sh_handler)   --> sh_cd_h.c
+- `ft_pwd.c` 		   (dir. sh_handler)   --> sh_pwd_h.c
+- `ft_exit.c` 		   (dir. sh_handler)   --> sh_exit_h.c
+- `ft_exec_builtins.c`     (dir. sh_operators) --> sh_exec_handler_ops.c
+- `ft_manage_files.c`      (dir. sh_operators) --> sh_mf_ops.c
 
 **Objectives:**
 - Implement core built-in commands
@@ -127,14 +127,14 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 5: Built-in Commands Part 2 (35 hours)
 **Files:**
-- `ft_env.c`
-- `ft_export.c`
-- `ft_unset.c`
-- `ft_exec_pipeline.c`
-- `ft_exec_binops.c`
-- `ft_manage_heredocs.c`
-- `s_pipes.c`
-- `s_pid.c`
+- `ft_env.c` 			(dir. sh_handler)    --> sh_env_h.c
+- `ft_export.c`			(dir. sh_handler)    --> sh_export_h.c
+- `ft_unset.c`   		(dir. sh_handler)    --> sh_unset_h.c
+- `ft_exec_pipeline.c`		(dir. sh_operators)  --> sh_pipeline_ops.c
+- `ft_exec_binops.c`		(dir. sh_operators)  --> sh_logical_ops.c
+- `ft_manage_heredocs.c`	(dir. sh_operators)  --> sh_heredoc_ops.c
+- `s_pipes.c`			(dir. sh_managers)   --> sh_pipe_m.c
+- `s_pid.c`			(dir. sh_managers)   --> sh_pid_m.c
 
 **Objectives:**
 - Complete remaining built-in commands
@@ -144,9 +144,9 @@ I'll break down the workflow with separate frontend, backend, and collaborative 
 
 #### Week 6: Final Integration (30 hours)
 **Files:**
-- `ft_manage_close.c`
-- `ft_exec_utils.c`
-- `ft_holder.c`
+- `ft_manage_close.c`  (dir. sh_operators)   --> sh_closers_ops.c
+- `ft_exec_utils.c`    (dir. sh_operators)   -->  
+- `ft_holder.c`        (dir. sh_pompt)	     --> sh_processor_pt.c
 
 **Objectives:**
 - Comprehensive integration testing
