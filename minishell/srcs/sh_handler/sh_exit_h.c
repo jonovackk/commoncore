@@ -37,8 +37,8 @@ void    exit_manager(int exit_code, error_t ec, t_sh_cmd *cmd)
     }
     rl_clear_history();
     if (cmd)
-        clear_env(*(cmd->environment));
-    clear_tree(get_tree_holder(0, NULL));
+        sh_destroy_env_list(*(cmd->environment));
+    sh_destroy_tree(get_tree_holder(0, NULL));
     exit(exit_code);
 }
 

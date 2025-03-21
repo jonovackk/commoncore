@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-void    attach_parent(t_sh_node **root, t_sh_node *new_parent, int pos)
+void    sh_set_parent_node(t_sh_node **root, t_sh_node *new_parent, int pos)
 {
     if (!root || !new_parent)
         return;
@@ -16,7 +16,7 @@ void    attach_parent(t_sh_node **root, t_sh_node *new_parent, int pos)
     *root = new_parent;
 }
 
-void    attach_child(t_sh_node **root, t_sh_node *child, int pos)
+void    sh_set_child_node(t_sh_node **root, t_sh_node *child, int pos)
 {
     if (!root)
         return;
@@ -31,7 +31,7 @@ void    attach_child(t_sh_node **root, t_sh_node *child, int pos)
         (*root)->right = child;
 }
 
-void    merge_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok)
+void    sh_connect_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok)
 {
     if (!root || !sibling)
         return;
@@ -40,30 +40,30 @@ void    merge_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_to
         *root = sibling;
         return;
     }
-    attach_parent(root, make_node(cmd, tok), LEFT);
-    attach_child(root, sibling, RIGHT);
+    sh_set_parent_node(root, make_node(cmd, tok), LEFT);
+    sh_set_child_node(root, sibling, RIGHT);
 }
 
-void        delete_node(t_sh_node *node)
+void        sh_destroy_node(t_sh_node *node)
 {
     if (!node)
         return;
     if (node->token)
         delete_token(node->token);
     if (node->command)
-        delete_command(node->command);
+        sh_free_cmd(node->command);
     free(node);
 }
 
-void        clear_tree(t_sh_node *node)
+void        sh_destroy_tree(t_sh_node *node)
 {
     if (!node)
         return;
-    clear_tree(node->left);
-    clean_tree(node->right);
+    sh_destroy_tree(node->left);
+    sh_destroy_tree(node->right);
     if (node->token)
         delete_token(node->token);
     if (node->command)
-        delete_command(node->command);
+        sh_free_cmd(node->command);
     free(node);
 }

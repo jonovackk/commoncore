@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-void    sh_add_env(t_sh_env **env, t_sh_env *new)
+void    sh_append_env(t_sh_env **env, t_sh_env *new)
 {
     t_sh_env    *tmp;
 
@@ -17,7 +17,7 @@ void    sh_add_env(t_sh_env **env, t_sh_env *new)
     tmp->next = new;
 }
 
-void    sh_remove_env(t_sh_env **env, char *key)
+void    sh_delete_env(t_sh_env **env, char *key)
 {
     t_sh_env    *prev;
     t_sh_env    *tmp;
@@ -36,13 +36,13 @@ void    sh_remove_env(t_sh_env **env, char *key)
     if (tmp && prev)
     {
         prev->next = tmp->next;
-        sh_free_env(tmp);
+        sh_destroy_env_node(tmp);
     }
     if (head)
         *env = head;
 }
 
-void    sh_free_env(t_sh_env *env)
+void    sh_destroy_env_node(t_sh_env *env)
 {
     free(env->key);
     if (env->values && *(env->values))
@@ -52,14 +52,14 @@ void    sh_free_env(t_sh_env *env)
     free(env);
 }
 
-void    sh_clear_env(t_sh_env *env)
+void    sh_destroy_env_list(t_sh_env *env)
 {
     t_sh_env    *tmp;
 
     while (env)
     {
         tmp = env->next;
-        sh_free_env(env);
+        sh_destroy_env_node(env);
         env = tmp;
     }
 }

@@ -40,4 +40,15 @@ error_t     prepare_command(t_sh_cmd *cmd);
 
 error_t     handle_heredocs(t_sh_node *nd, int *nd, int *hd);
 
+void sh_tree_fd_cleanup(t_sh_token *tree);
+
+void sh_cmd_cleanup(t_sh_cmd *cmd);
+
+void sh_close_multiple_fd(int count, int fd, ...);
+
+void sh_exec_release(t_sh_exec *executor);
+
+void sh_cleanup_pipes(t_sh_pipe *pipes);
+
+
 

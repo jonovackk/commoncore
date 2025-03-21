@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-char	*sh_get_path(char *cmd, t_sh_env *env)
+char	*sh_find_path(char *cmd, t_sh_env *env)
 {
 	int		i;
 	char	*path;
@@ -20,13 +20,13 @@ char	*sh_get_path(char *cmd, t_sh_env *env)
 	while (env->values[i] && access(path, X_OK) == -1)
 	{
 		free(path);
-		path = ft_strjoin(env->values[i++], bin, 0, 0)
+		path = ft_strjoin(env->values[i++], bin, 0, 0);
 	}
 	free(bin);
 	return (path);
 }
 
-void	sh_destroy_cmd(t_sh_cmd *cmd)
+void	sh_free_cmd(t_sh_cmd *cmd)
 {
 	ft_clear_redir_list(cmd->redirects);
 	free(cmd->executable);

@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 /**
  * @brief Closes multiple file descriptors
@@ -39,7 +39,7 @@ void sh_close_multiple_fd(int count, int fd, ...)
  * 
  * @param cmd Command with file descriptors to close
  */
-void sh_close_command(t_sh_cmd *cmd)
+void sh_cmd_cleanup(t_sh_cmd *cmd)
 {
   if (!cmd)
     return;
@@ -60,18 +60,18 @@ void sh_close_command(t_sh_cmd *cmd)
  * 
  * @param tree Root of the execution tree
  */
-void sh_close_tree_recursively(t_sh_token *tree)
+void sh_tree_fd_cleanup(t_sh_token *tree)
 {
   if (!tree)
     return;
   // recursevely close left subtree
   if (tree->left)
-    sh_close_tree_recursively(tree->left);
+    sh_tree_fd_cleanup(tree->left);
     // recursevely close right subtree
   if (tree->right)
-    sh_close_tree_recursively(tree->right);
+    sh_tree_fd_cleanup(tree->right);
   if (tree->command)
-    sh_close_command(tree->command);
+    sh_cmd_cleanup(tree->command);
 }
 /**
  * @brief Closes resources in an executor
@@ -80,7 +80,7 @@ void sh_close_tree_recursively(t_sh_token *tree)
  * 
  * @param executor Execution context to clean up
  */
-void sh_close_executor(t_sh_exec *executor)
+void sh_exec_release(t_sh_exec *executor)
 {
   t_sh_pipe *current_pipe;
   t_sh_pid *current_pid;
@@ -111,7 +111,7 @@ void sh_close_executor(t_sh_exec *executor)
  * 
  * @param pipes List of pipes to close
  */
-void sh_close_pipes(t_sh_pipe *pipes)
+void sh_cleanup_pipes(t_sh_pipe *pipes)
 {
   if (!pipes)
     return;

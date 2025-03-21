@@ -39,7 +39,7 @@ t_error sh_process_line(char **i_line, t_sh_env **env)
   // handle specific error scenarios
   if (proc_error == ERROR_CRITICAL)
   {
-    sh_cleanup_environment(*env);
+    sh_destroy_env_list(*env);
     sh_exit(NULL);
   }
   else if (proc_error == ERROR_PROCESSING_FAILED || !*i_line)
@@ -83,7 +83,7 @@ t_error sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **env
     return (ERROR_PROCESSING_FAILED);
   }
   // process tokens(expand home, remove braces)
-  sh_format_tokens(tokens, sh_env_get(*environment, "HOME"));
+  sh_format_tokens(tokens, sh_find_env(*environment, "HOME"));
   sh_remove_token_braces(tokens);
   // additional validation
   if (!*tokens)
@@ -116,7 +116,7 @@ t_error sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree,
   if (sh_process_herecod(*execution_tree))
     return (ERROR_HEREDOC_STOP);
   // initialize executors
-  executor = sh_create_executor();
+  executor = sh_exec_init();
   // tmp ignore signals during execution
   sh_signal_set_state(SIGANL_IGNORE);
   // execute command multiplexer
@@ -153,7 +153,7 @@ t_error sh_process_heredoc(t_sh_node *execution_tree)
   if(sh_manage_heredocs(execution_tree, &heredoc_completed) == ERROR_HEREDOC_STOP)
   {
     sh_close_tree_recursively(execution_tree);
-    sh_cleanup_execution_tree(execution_tree);
+    sh_destroy_tree(execution_tree);
     return(ERROR_PROCESSING_FAILED);
   }
   return (ERROR_NONE);
@@ -185,5 +185,5 @@ void sh_handle_prompt(t_sh_env **environment)
     return;
   // cleanup
   sh_close_tree_recursively(execution_tree);
-  sh_cleanup_execution_tree(execution_tree);
+  sh_destroy_tree(execution_tree);
 }

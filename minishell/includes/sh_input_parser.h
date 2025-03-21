@@ -124,7 +124,7 @@ void    skip_quotes(char **s, int *rem, t_qstate *state);
 
 void    insert_env_variable(t_sh_env *env, char *s, char ***res_parts, t_qstate state);
 
-void     replace_env_vars(t_sh_env *env, char **line, t_qstate state)
+void     replace_env_vars(t_sh_env *env, char **line, t_qstate state);
 
 
 

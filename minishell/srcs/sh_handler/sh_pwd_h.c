@@ -43,9 +43,9 @@ char    *get_prompt_str(t_sh_env *envp)
 
     if (envp)
         saved_env = envp;
-    if (sh_get_env(saved_env, "PWD"))
+    if (sh_find_env(saved_env, "PWD"))
     {
-        pwd = trim_pwd(sh_get_env(saved_env, "PWD")->values[0]);
+        pwd = trim_pwd(sh_find_env(saved_env, "PWD")->values[0]);
         pwd = ft_strjoin(pwd, " ~ ", 0, 0b01);
     }
     else

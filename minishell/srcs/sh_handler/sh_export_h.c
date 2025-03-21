@@ -51,18 +51,18 @@ int     export_var(t_sh_cmd *cmd, char *tmp)
         free(var[1]);
         var[1] = trimmed;
         if (ft_strlen(var[0] && var[0][ft_strlen(var[0]) - 1] == '+'))
-            sh_append_env(cmd->environment, var[0], ft_strdup(var[1]));
+            sh_extend_env(cmd->environment, var[0], ft_strdup(var[1]));
         else
         {
             if (var[1])
-                sh_set_env(cmd->environment, var[0], ft_strdup(var[1]));
+                sh_update_env(cmd->environment, var[0], ft_strdup(var[1]));
             else
-                sh_set_env(cmd->environment, var[0], "");
+                sh_update_env(cmd->environment, var[0], "");
         }
         free_str_array((void **)var);
     }
-    else if (!sh_get_env(*(cmd->environment), tmp))
-        sh_set_env(cmd->environment, tmp, NULL);
+    else if (!sh_find_env(*(cmd->environment), tmp))
+        sh_update_env(cmd->environment, tmp, NULL);
     return (ERR_NONE);
 }
 

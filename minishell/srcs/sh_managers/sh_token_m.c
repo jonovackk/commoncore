@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-void      sh_add_token(t_sh_token **list, t_sh_token *new_tok)
+void      sh_append_token(t_sh_token **list, t_sh_token *new_tok)
 {
     t_sh_token  *tmp;
 
@@ -18,7 +18,7 @@ void      sh_add_token(t_sh_token **list, t_sh_token *new_tok)
     new_tok->prev = tmp;
 }
 
-void      sh_remove_token(t_sh_token **list)
+void      sh_delete_token(t_sh_token **list)
 {
     t_sh_token  *tmp;
 
@@ -29,7 +29,7 @@ void      sh_remove_token(t_sh_token **list)
         if (tmp->next)
             tmp->next->prev = (*list)->prev;
         *list = (*list)->prev->next;
-        sh_free_token(tmp);
+        sh_token_free(tmp);
     }
     else
     {
@@ -37,11 +37,11 @@ void      sh_remove_token(t_sh_token **list)
         *list = tmp->next;
         if (tmp->next)
             (*list)->prev = NULL;
-        sh_free_token(tmp);
+        sh_token_free(tmp);
     }
 }
 
-t_sh_token  *sh_dup_token(t_sh_token *tok)
+t_sh_token  *sh_clone_token(t_sh_token *tok)
 {
     t_sh_token  *cpy;
 
@@ -55,7 +55,7 @@ t_sh_token  *sh_dup_token(t_sh_token *tok)
     return (cpy);
 }
 
-void      sh_free_token(t_sh_token *tok)
+void      sh_token_free(t_sh_token *tok)
 {
     if (!tok)
         return;
@@ -63,14 +63,14 @@ void      sh_free_token(t_sh_token *tok)
     free(tok);
 }
 
-void      sh_clear_token_list(t_sh_token *list)
+void      sh_free_token_list(t_sh_token *list)
 {
     t_sh_token  *tmp;
 
     while (list)
     {
         tmp = list->next;
-        sh_free_token(list);
+        sh_token_free(list);
         list = tmp;
     }
 }

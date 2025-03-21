@@ -13,11 +13,11 @@ void    init_env_defaults(t_sh_env **env, char **argv)
 {
     char    *tmp;
 
-    sh_set_env(env, "OLDPWD", NULL);
+    sh_update_env(env, "OLDPWD", NULL);
     tmp = sh_get_pwd();
-    sh_set_env(env, "PWD", tmp);
+    sh_update_env(env, "PWD", tmp);
     tmp = str_join(sh_get_pwd(), argv[0]m "/", 0b01);
-    sh_set_env(env, "_", tmp);
+    sh_update_env(env, "_", tmp);
 }
 
 t_sh_env    *setup_env(char **argv, char **envp)
@@ -30,21 +30,21 @@ t_sh_env    *setup_env(char **argv, char **envp)
     env = NULL;
     tmp = NULL;
     while (envp[++i])
-        sh_add_env(&env, sh_create_env_var(envp[i]));
+        sh_append_env(&env, sh_create_env_var(envp[i]));
     if (i == 0)
         init_env_defaults(&env, argv);
-    if (sh_get_env(env, "SHLVL") && sh_get_env(env, "SHLVL")->values)
-        tmp = ft_itoa(1 + ft_atoi(sh_get_env(env, "SHLVL")->values[0]));
+    if (sh_find_env(env, "SHLVL") && sh_find_env(env, "SHLVL")->values)
+        tmp = ft_itoa(1 + ft_atoi(sh_find_env(env, "SHLVL")->values[0]));
     else
         tmp = ft_strdup("1");
-    sh_set_env(&env, "SHLVL", tmp);
+    sh_update_env(&env, "SHLVL", tmp);
     if (i)
     {
         tmp = ft_strdup("minishell");
-        sh_set_env(&env, "SHELL", tmp);
+        sh_update_env(&env, "SHELL", tmp);
     }
-    if (sh_get_env(env, "PWD") && sh_get_env(env, "PWD")->values)
-        tmp = str_join(sh_get_env(env, "PWD")->values[0], "/logo", "", 0b00);
-    sh_set_env(&env, "LOGOPWD", tmp);
+    if (sh_find_env(env, "PWD") && sh_find_env(env, "PWD")->values)
+        tmp = str_join(sh_find_env(env, "PWD")->values[0], "/logo", "", 0b00);
+    sh_update_env(&env, "LOGOPWD", tmp);
     return (env);
 }

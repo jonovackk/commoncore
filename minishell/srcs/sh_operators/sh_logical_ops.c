@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 /**
  * @brief Waits for and processes logical AND/OR operation processes
@@ -19,7 +19,7 @@ int sh_wait_logical_operation(t_sh_exec *executor)
   if(process_to_wait)
   {
     // close pipe resources
-    sh_close_pipes(executor->pipes);
+    sh_cleanup_pipes(executor->pipes);
     // wait for process and process its exit
     waitpid(process_to_wait->pid, &exit_code, 0);
     sh_process_command_exit(exit_code);

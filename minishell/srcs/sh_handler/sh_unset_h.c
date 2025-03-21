@@ -16,6 +16,6 @@ int sh_unset_variables(t_sh_cmd *cmd)
     current_arg = cmd->arguments + 1;
     // remove each specified variable from environment
     while (*current_arg)
-        sh_remove_environment_variable(cmd->environment, *(current_arg++));
+        sh_delete_env(cmd->environment, *(current_arg++));
     return (ERR_NONE);
 }

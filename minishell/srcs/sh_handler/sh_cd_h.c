@@ -2,9 +2,9 @@
 
 void    load_directory_env(t_sh_env *envp, t_sh_env **vars)
 {
-    vars[0] = sh_get_env(envp, "HOME");
-    vars[1] = sh_get_env(envp, "OLDPWD");
-    vars[2] = sh_get_env(envp, "PWD");
+    vars[0] = sh_find_env(envp, "HOME");
+    vars[1] = sh_find_env(envp, "OLDPWD");
+    vars[2] = sh_find_env(envp, "PWD");
     vars[3] = NULL;
 }
 
@@ -65,12 +65,12 @@ int     cd_builtin(t_sh_cmd *cmd)
     else if (process_cd_args(argc -1, cmd->arguments + 1, vars, cmd->outfile))
         return (ERR_FAIL);
     if (vars[2])
-        sh_set_env(cmd->environment, "OLDPWD", ft_strdup(vars[2]->values[0]));
+        sh_update_env(cmd->environment, "OLDPWD", ft_strdup(vars[2]->values[0]));
     else
         print_error_message(ERR_UNSET, "OLDPWD");
     newdir = sh_get_pwd();
     if (newdir)
-        sh_set_env(cmd->environment, "PWD", newdir);
+        sh_update_env(cmd->environment, "PWD", newdir);
     else
         print_error_message(ERR_UNSET, "PWD");
     return (ERR_NONE);

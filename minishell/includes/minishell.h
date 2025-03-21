@@ -31,13 +31,15 @@
 
 # include "../libft/includes/libft.h"
 
-# include "ft_dt_struct.h"
+# include "sh_handler.h"
 
-# include "ft_parsing.h"
+# include "sh_input_parser.h"
+
+# include "sh_managers.h"
+
+# include "sh_operators.h"
 
 # include "ft_enumerates.h"
-
-# include "ft_exec.h"
 
 
 

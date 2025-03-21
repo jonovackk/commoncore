@@ -21,7 +21,7 @@ void display_logo(t_envvar *env)
     int fd;
     char *line;
 
-    logo_var = ft_get_env_var(env, "LOGOPATH");
+    logo_var = sh_find_env(env, "LOGOPATH");
     if (!logo_var)
         return;
     fd = open(logo_var->values[0], O_RDONLY);

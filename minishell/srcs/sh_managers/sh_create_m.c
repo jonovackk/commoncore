@@ -26,7 +26,7 @@ t_sh_env *sh_create_env_var(char *input)
     return (new_env);
 }
 
-t_sh_cmd *sh_create_command(t_sh_redir *redirects, char **args, t_sh_env **env)
+t_sh_cmd *sh_create_cmd(t_sh_redir *redirects, char **args, t_sh_env **env)
 {
     t_sh_cmd   *cmd;
 
@@ -39,7 +39,7 @@ t_sh_cmd *sh_create_command(t_sh_redir *redirects, char **args, t_sh_env **env)
     cmd->redirects = redirects;
     cmd->executable = NULL;
     if (args)
-        cmd->executable = sh_get_path(*args, *env);
+        cmd->executable = sh_find_path(*args, *env);
     cmd->arguments = args;
     cmd->environment = env;
     return (cmd);

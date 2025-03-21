@@ -88,7 +88,7 @@ void sh_signal_heredoc_mode (int signal)
       // rmv tmp herecod file
       unlink(sh_get_heredoc_holder(NULL, 0));
       // cleanup environment
-      sh_clear_environment(sh_update_environment(NULL));
+      sh_destroy_env_list(sh_update_environment(NULL));
       // free heredoc related resources
       free(sh_get_heredoc_holder(NULL, 0));
       free(sh_get_heredoc_holder(NULL, 1));

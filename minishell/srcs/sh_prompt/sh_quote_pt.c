@@ -89,7 +89,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
     sh_set_quote_holder((char *)&tmp_fd, 1);
     // clean up resources
     rl_clear_history();
-    sh_clear_environment(*env);
+    sh_destroy_env_list(*env);
     free(tmp);
     // write original line to tmp file
     write (tmp_fd, line, ft_strlen(line));
@@ -120,7 +120,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
  * @return Error status of quote handling
  */
 
- t_error sh_quote_handler(char **line, t_sh_env **env, int status)
+ error_t sh_quote_handler(char **line, t_sh_env **env, int status)
  {
   char *dquote_file;
   char *history_line;

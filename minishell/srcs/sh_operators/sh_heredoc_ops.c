@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 /**
  * @brief Handles heredoc limit error
@@ -14,7 +14,7 @@ void sh_handle_heredoc_limit(t_sh_token *tokens, t_sh_env **environment)
   sh_error_display(ERROR_HEREDOC_LIMIT, NULL);
   // cleanup resources
   sh_cleanup_token_list(tokens);
-  sh_clear_environment(*environment);
+  sh_destroy_env_list(*environment);
   //exit whit error status
   exit(ERROR_CRITICAL);
 }
@@ -163,12 +163,12 @@ int sh_create_heredoc(char *delimiter, char *temp_file)
         // create temporary file
         fd = open(temp_file, O_CREAT | O_EXCL | O_WRONLY, 0600);
         // cleanup resources
-        sh_clear_execution_tree(sh_get_current_tree());
+        sh_destroy_tree(sh_get_current_tree());
         rl_clear_history();
         // process heredoc
         error_code = sh_process_heredoc_line(delimiter, temp_file, fd);
         // final cleanup
-        sh_clear_environment(sh_update_environment(NULL));
+        sh_destroy_env_list(sh_update_environment(NULL));
         sh_close_multiple_fd(4, fd, 
                               STDIN_FILENO, 
                               STDOUT_FILENO, 

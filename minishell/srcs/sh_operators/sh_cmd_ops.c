@@ -60,7 +60,7 @@ void    update_command_path(t_sh_cmd *cmd)
     free(cmd->executable);
     cmd->executable = NULL;
     if (cmd->arguments && *cmd->arguments)
-        cmd->executable = sh_get_path(*cmd->arguments, *(cmd->environment));
+        cmd->executable = sh_find_path(*cmd->arguments, *(cmd->environment));
 }
 
 error_t     prepare_command(t_sh_cmd *cmd)

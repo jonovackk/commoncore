@@ -64,7 +64,7 @@ typedef struct s_cmd_detail {
  * conditional execution through a binary tree representation
  */
 typedef struct s_exec_node {
-    t_sh_cmd *command;       // Command to be executed at this node
+    t_sh_cmd *cmd;       // Command to be executed at this node
     t_sh_token *token;       // Associated token (for operators)
     struct s_exec_node *left;   // Left subtree (typically first command)
     struct s_exec_node *right;  // Right subtree (next command/pipeline)
@@ -104,6 +104,22 @@ typedef struct s_execution_context {
 } t_sh_exec;
 
 
+
+typedef struct s_process_id
+{
+  pid_t pid; // identifier
+  struct s_process_id *next; // next process in the tracking list
+} t_sh_pid;
+
+typedef struct s_pipe_info
+{
+  int fds[2]; // read and write file descriptors
+  struct s_pipe_info *next; // next pipe in the pipeline
+} t_sh_pipe;
+
+
+
+
 //shell_data_structure
 //builders.c
 /**
@@ -124,7 +140,7 @@ t_sh_env    *sh_create_env_var(char *input);
  * 
  * @return           A pointer to the newly allocated command structure.
  */
-t_sh_cmd    *sh_create_command(t_sh_redir *redirects, char **args, t_sh_env **env);
+t_sh_cmd    *sh_create_cmd(t_sh_redir *redirects, char **args, t_sh_env **env);
 
 /**
  * @brief            Creates a new execution node.
@@ -156,14 +172,14 @@ t_sh_token  *sh_create_token(char **text, t_token_kind kind);
  * 
  * @return           Command path.
  */
-char        *sh_get_path(char *c, t_sh_env *env);
+char        *sh_find_path(char *c, t_sh_env *env);
 
 /**
  * @brief            De-allocate a command structure.
  * 
  * @param cmd        Command to free.
  */
-void    sh_destroy_cmd(t_sh_cmd *cmd);
+void    sh_free_cmd(t_sh_cmd *cmd);
 
 //variables.c
 
@@ -173,7 +189,7 @@ void    sh_destroy_cmd(t_sh_cmd *cmd);
  * @param env        Environment linked list.
  * @param new        New environment variable to add.
  */
-void    sh_add_env(t_sh_env **env, t_sh_env *new);
+void    sh_append_env(t_sh_env **env, t_sh_env *new);
 
 /**
  * @brief            Removes an environment variable from the list.
@@ -181,21 +197,21 @@ void    sh_add_env(t_sh_env **env, t_sh_env *new);
  * @param env        Environment linked list.
  * @param key        Name of the variable to remove.
  */
-void    sh_remove_env(t_sh_env **env, char *key);
+void    sh_delete_env(t_sh_env **env, char *key);
 
 /**
  * @brief            De-allocate a single environment variable.
  * 
  * @param env        Environment variable to free.
  */
-void    sh_free_env(t_sh_env *env);
+void    sh_destroy_env_node(t_sh_env *env);
 
 /**
  * @brief            De-allocate the entire environment linked list.
  * 
  * @param env        Environment linked list to free.
  */
-void    sh_clear_env(t_sh_env *env);
+void    sh_destroy_env_list(t_sh_env *env);
 
 
 //variables_utils.c
@@ -208,7 +224,7 @@ void    sh_clear_env(t_sh_env *env);
  * 
  * @return           Pointer to the found environment variable, NULL otherwise.
  */
-t_sh_env    *sh_get_env(t_sh_env *env, char *key);
+t_sh_env    *sh_find_env(t_sh_env *env, char *key);
 
 /**
  * @brief            Retrieves the last environment variable in the list.
@@ -217,7 +233,7 @@ t_sh_env    *sh_get_env(t_sh_env *env, char *key);
  * 
  * @return           Pointer to the last environment variable.
  */
-t_sh_env    *sh_last_env(t_sh_env *env);
+t_sh_env    *sh_get_last_env(t_sh_env *env);
 
 /**
  * @brief            Sets the value of an environment variable.
@@ -226,7 +242,7 @@ t_sh_env    *sh_last_env(t_sh_env *env);
  * @param key        Name of the variable to modify.
  * @param val        New value for the variable.
  */
-void    sh_set_env(t_sh_env **env, char *key, char *val);
+void    sh_update_env(t_sh_env **env, char *key, char *val);
 
 /**
  * @brief            Appends a string to an environment variable value.
@@ -235,7 +251,7 @@ void    sh_set_env(t_sh_env **env, char *key, char *val);
  * @param key        Name of the variable.
  * @param val        String to append.
  */
-void    sh_append_env(t_sh_env **env, char *key, char *val);
+void    sh_extend_env(t_sh_env **env, char *key, char *val);
 
 //sh_exec.c
 
@@ -346,14 +362,14 @@ void  sh_clear_redir_list(t_sh_redir *redir);
  * @param list       Token linked list.
  * @param new_tok    New token to append.
  */
-void      sh_add_token(t_sh_token **list, t_sh_token *new_tok);
+void      sh_append_token(t_sh_token **list, t_sh_token *new_tok);
 
 /**
  * @brief            Removes a token from the linked list.
  * 
  * @param list       Token linked list.
  */
-void      sh_remove_token(t_sh_token **list);
+void      sh_delete_token(t_sh_token **list);
 
 /**
  * @brief            Duplicates a token.
@@ -362,21 +378,21 @@ void      sh_remove_token(t_sh_token **list);
  * 
  * @return           A pointer to a new token with the same properties.
  */
-t_sh_token  *sh_dup_token(t_sh_token *tok);
+t_sh_token  *sh_clone_token(t_sh_token *tok);
 
 /**
  * @brief            De-allocate a token.
  * 
  * @param tok        Token to free.
  */
-void      sh_free_token(t_sh_token *tok);
+void      sh_token_free(t_sh_token *tok);
 
 /**
  * @brief            De-allocate the entire token linked list.
  * 
  * @param list       Token linked list to free.
  */
-void      sh_clear_token_list(t_sh_token *list);
+void      sh_free_token_list(t_sh_token *list);
 
 //sh_tree.c
 
@@ -425,14 +441,37 @@ void    sh_clear_tree(t_sh_node *tree);
 
 
 
-void    attach_parent(t_sh_node **root, t_sh_node *new_parent, int pos);
+void    sh_set_parent_node(t_sh_node **root, t_sh_node *new_parent, int pos);
 
-void    attach_child(t_sh_node **root, t_sh_node *child, int pos);
+void    sh_set_child_node(t_sh_node **root, t_sh_node *child, int pos);
 
-void    merge_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok);
+void    sh_connect_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok);
 
-void        delete_node(t_sh_node *node);
+void        sh_destroy_node(t_sh_node *node);
 
-void        clear_tree(t_sh_node *node);
+void        sh_destroy_tree(t_sh_node *node);
+
+t_sh_pid *sh_init_pid(pid_t pid);
+
+void sh_pid_push(t_sh_pid **head, t_sh_pid *top);
+
+t_sh_pid *sh_pid_pop(t_sh_pid **head);
+
+void sh_delete_pid_list(t_sh_pid *pid_list);
+
+t_sh_pipe *sh_init_pipes(void);
+
+void sh_pipes_push(t_sh_pipe **head, t_sh_pipe *top);
+
+t_sh_pipe *sh_pipes_pop(t_sh_pipe **head);
+
+void sh_delete_pipe(t_sh_pipe *pipe_node);
+
+
+
+
+
+
+
 
 #endif

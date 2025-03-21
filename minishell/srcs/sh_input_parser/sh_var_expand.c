@@ -51,7 +51,7 @@ void    insert_env_variable(t_sh_env *env, char *s, char ***res_parts, t_qstate 
     if (ft_strchr("\"'", *s))
         return;
     key = ft_strndup(s, key_len - 1);
-    env_var = sh_get_env(env, key);
+    env_var = sh_find_env(env, key);
     if (!env_var)
         ft_strapp(res_parts, ft_strdup(""));
     else
