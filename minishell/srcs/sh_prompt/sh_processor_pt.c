@@ -15,7 +15,7 @@ extern int g_shell_exit_status;
  * 
  * @return Error status of prompt processing
  */
-t_error sh_process_line(char **i_line, t_sh_env **env)
+error_t sh_process_line(char **i_line, t_sh_env **env)
 {
   char *p_str;
   int proc_error;
@@ -60,7 +60,7 @@ t_error sh_process_line(char **i_line, t_sh_env **env)
  * 
  * @return Error status of tokenization
  */
-t_error sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **environment)
+error_t sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **environment)
 {
   t_error syntax_status;
   char *error_token;
@@ -88,6 +88,10 @@ t_error sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **env
   // additional validation
   if (!*tokens)
     return (ERROR_PROCESSING_FAILED);
+  free(input_line);
+  if (syntax_status & 0b100)
+    sh_handle_heredoc_limit(*tokens, environment);
+  return (ERR_NONE);
 }
 
 /**
@@ -101,7 +105,7 @@ t_error sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **env
  * 
  * @return Error status of execution
  */
-t_error sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree, t_sh_env **environment)
+error_t sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree, t_sh_env **environment)
 {
   t_sh_exec *executor;
   t_sh_pid *waiting_process;
@@ -145,14 +149,14 @@ t_error sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree,
  * @return Error status of heredoc processing
  */
 
-t_error sh_process_heredoc(t_sh_node *execution_tree)
+error_t   sh_process_heredoc(t_sh_node *execution_tree)
 {
   int heredoc_completed;
 
   heredoc_completed = 0;
-  if(sh_manage_heredocs(execution_tree, &heredoc_completed) == ERROR_HEREDOC_STOP)
+  if(sh_traverse_heredocs(execution_tree, &heredoc_completed) == ERROR_HEREDOC_STOP)
   {
-    sh_close_tree_recursively(execution_tree);
+    sh_tree_fd_cleanup(execution_tree);
     sh_destroy_tree(execution_tree);
     return(ERROR_PROCESSING_FAILED);
   }
@@ -184,6 +188,6 @@ void sh_handle_prompt(t_sh_env **environment)
   if (sh_execute_command_tree(&tokens, &execution_tree, environment))
     return;
   // cleanup
-  sh_close_tree_recursively(execution_tree);
+  sh_tree_fd_cleanup(execution_tree);
   sh_destroy_tree(execution_tree);
 }

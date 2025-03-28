@@ -51,13 +51,13 @@ int sh_execute_logical_and(t_sh_node *tree, int *node_fd, t_sh_exec *executor)
   if (node_fd[0] != STDERR_FILENO)
     dup2(node_fd[0], STDIN_FILENO);
   // execute left side of AND
-  sh_execute_command_multiplex(tree->left, node_fd, executor, EXECUTION_WAIT);
+  sh_execute_command_multiplex(tree->left, node_fd, executor, EXEC_WAIT);
   exit_code = sh_wait_logical_operation(executor);
   g_shell_exit_status = exit_code;
   // if left side succeeds, execute right side
-  if (exit_code == ERROR_NONE)
+  if (exit_code == ERR_NONE)
   {
-    sh_execute_command_multiplex(tree->right, node_fd, executor, EXECUTION_WAIT);
+    sh_execute_command_multiplex(tree->right, node_fd, executor, EXEC_WAIT);
     g_shell_exit_status = sh_wait_logical_operation(executor);
   }
   return(g_shell_exit_status);
@@ -80,14 +80,14 @@ int sh_execute_logical_or(t_sh_node *tree, int *node_fd, t_sh_exec *executor)
     if (node_fd[0] != STDIN_FILENO)
         dup2(node_fd[0], STDIN_FILENO);
     // execute left side of OR
-    sh_execute_command_multiplex(tree->left, node_fd, executor, EXECUTION_WAIT);
+    sh_execute_command_multiplex(tree->left, node_fd, executor, EXEC_WAIT);
     // wait and get exit code
     exit_code = sh_wait_logical_operation(executor);
     g_shell_exit_status = exit_code;
     // iff left side fails, execute right side
-    if (exit_code != ERROR_NONE)
+    if (exit_code != ERR_NONE)
     {
-        sh_execute_command_multiplex(tree->right, node_fd, executor, EXECUTION_WAIT);
+        sh_execute_command_multiplex(tree->right, node_fd, executor, EXEC_WAIT);
         g_shell_exit_status = sh_wait_logical_operation(executor);
     }
     return (g_shell_exit_status);

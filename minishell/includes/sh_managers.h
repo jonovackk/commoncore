@@ -1,5 +1,5 @@
-#ifndef FT_DATA_STRUCT_H
-# define FT_DATA_STRUCT_H
+#ifndef FT_MANAGERS_H
+# define FT_MANAGERS_H
 
 # define LEFT 0
 # define RIGHT 1
@@ -30,7 +30,7 @@ typedef struct s_env_var {
 } t_sh_env;
 
 /**
- * @brief Manages input/output redirections for a command
+ * @brief Manages input/output redirections for a commandsh_init_pipes
  * 
  * Supports various redirection types like input, output, 
  * append, and here-document
@@ -102,20 +102,6 @@ typedef struct s_execution_context {
     t_sh_pipe *active_pipes; // Currently active pipe connections
     t_sh_pid *running_procs; // Processes currently being managed
 } t_sh_exec;
-
-
-
-typedef struct s_process_id
-{
-  pid_t pid; // identifier
-  struct s_process_id *next; // next process in the tracking list
-} t_sh_pid;
-
-typedef struct s_pipe_info
-{
-  int fds[2]; // read and write file descriptors
-  struct s_pipe_info *next; // next pipe in the pipeline
-} t_sh_pipe;
 
 
 
@@ -459,11 +445,11 @@ t_sh_pid *sh_pid_pop(t_sh_pid **head);
 
 void sh_delete_pid_list(t_sh_pid *pid_list);
 
-t_sh_pipe *sh_init_pipes(void);
+t_sh_pipe *sh_init_pipe(void);
 
-void sh_pipes_push(t_sh_pipe **head, t_sh_pipe *top);
+void sh_pipe_push(t_sh_pipe **head, t_sh_pipe *top);
 
-t_sh_pipe *sh_pipes_pop(t_sh_pipe **head);
+t_sh_pipe *sh_pipe_pop(t_sh_pipe **head);
 
 void sh_delete_pipe(t_sh_pipe *pipe_node);
 

@@ -2,7 +2,7 @@
 
 extern int  g_exit_code;
 
-void    pipe_builtin(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, t_sh_exec *exec_ctx)
+void    sh_execute_builtin_piped(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 {
     pid_t   child;
     int     ret;
@@ -22,7 +22,7 @@ void    pipe_builtin(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, t_sh_exec *e
         }
         ret = builtin_func(cmd);
         close_exec(exec_ctx);
-        close_tree_rec(get_tree_holder(0, NULL));
+        sh_tree_fd_cleanup(get_tree_holder(0, NULL));
         free(exec_ctx);
         if (builtin_func != &exit_builtin)
             fork_exit(exec_ctx);
@@ -32,13 +32,13 @@ void    pipe_builtin(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, t_sh_exec *e
     push_pid(&(exec_ctx->running_procs), init_pid(child));
 }
 
-void    wait_builtin(int (*builtin_func)(t_sh_cmd *), t_sh_cmd, t_sh_exec *exec_ctx)
+void    sh_validate_builtin_direct(int (*builtin_func)(t_sh_cmd *), t_sh_cmd, t_sh_exec *exec_ctx)
 {
     int     err_code;
 
     if (builtin_func == &exit_builtin && array_len(cmd->arguments) <= 2)
     {
-        close_tree_rec(get_tree_holder(0, NULL));
+        sh_tree_fd_cleanup(get_tree_holder(0, NULL));
         close_exec(exec_ctx);
         free(exec_ctx);
         ft_dprintf(2, "exit\n");
@@ -48,7 +48,7 @@ void    wait_builtin(int (*builtin_func)(t_sh_cmd *), t_sh_cmd, t_sh_exec *exec_
     close_cmd(cmd);
 }
 
-error_t     builtin_checker(t_sh_cmd *cmd)
+error_t     sh_validate_builtin_flags(t_sh_cmd *cmd)
 {
     char    **tmp;
 
@@ -69,7 +69,7 @@ error_t     builtin_checker(t_sh_cmd *cmd)
     return (ERR_NONE);
 }
 
-error_t     execute_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec_t mode)
+error_t     sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec_t mode)
 {
     char    *trim;
     int     index;
@@ -87,16 +87,16 @@ error_t     execute_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec_t 
         index++;
     free(trim);
     if (!builtin_strs[index])
-        return (ERR_GEN);
+        return (ERR_FAIL_UNKNOWN);
     if (cmd->infile == STDIN_FILENO && fd[0] != STDERR_FILENO)
         cmd->infile = fd[0];
     if (cmd->outfile == STDOUT_FILENO && fd[1] != STDOUT_FILENO)
         cmd->outfile = fd[1];
-    if (builtin_checker(cmd))
+    if (sh_validate_builtin_flags(cmd))
         return (ERR_NONE);
     if (mode == EXEC_PIPE)
-        pipe_builtin(builtins[index], cmd, exec_ctx);
+    sh_execute_builtin_piped(builtins[index], cmd, exec_ctx);
     else
-        wait_builtin(builtins[index], cmd, exec_ctx);
+    sh_validate_builtin_direct(builtins[index], cmd, exec_ctx);
     return (ERR_NONE);
 }
