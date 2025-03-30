@@ -38,7 +38,7 @@ void    sh_refresh_args(t_sh_cmd *cmd)
     {
         if (ft_strchr(*tmp, '$'))
         {
-            replace_env_vars(*cmd->environment, tmp, QT_NONE);
+            replace_env_vars(*cmd->environment, tmp, QUOTE_NONE);
             if (**tmp)
             {
                 raw = ft_split(*tmp, ' ');
@@ -71,10 +71,10 @@ error_t     sh_prepare_cmd(t_sh_cmd *cmd)
     tmp = cmd->arguments;
     while (tmp && *tmp)
     {
-        if (verify_wildcard(*tmp, QT_NONE))
+        if (verify_wildcard(*tmp, QUOTE_NONE))
             expand_wildcards(tmp++);
         else
-            remove_quotes(tmp++, QT_NONE);
+            remove_quotes(tmp++, QUOTE_NONE);
     }
     sh_refresh_executable(cmd);
     if (!cmd->executable && !cmd->redirects)

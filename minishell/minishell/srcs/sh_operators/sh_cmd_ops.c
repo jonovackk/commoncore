@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-char    **quoted_split(char *s, char *sep)
+char    **sh_tokenize_quoted(char *s, char *sep)
 {
     t_qstate    state;
     char    **result;
@@ -26,7 +26,7 @@ char    **quoted_split(char *s, char *sep)
     return (result);
 }
 
-void    update_arguments(t_sh_cmd *cmd)
+void    sh_refresh_args(t_sh_cmd *cmd)
 {
     char        **new_args;
     char        **raw;
@@ -38,7 +38,7 @@ void    update_arguments(t_sh_cmd *cmd)
     {
         if (ft_strchr(*tmp, '$'))
         {
-            replace_env_vars(*cmd->environment, tmp, QT_NONE);
+            replace_env_vars(*cmd->environment, tmp, QUOTE_NONE);
             if (**tmp)
             {
                 raw = ft_split(*tmp, ' ');
@@ -55,7 +55,7 @@ void    update_arguments(t_sh_cmd *cmd)
     cmd->arguments = new_args;
 }
 
-void    update_command_path(t_sh_cmd *cmd)
+void    sh_refresh_executable(t_sh_cmd *cmd)
 {
     free(cmd->executable);
     cmd->executable = NULL;
@@ -63,26 +63,26 @@ void    update_command_path(t_sh_cmd *cmd)
         cmd->executable = sh_find_path(*cmd->arguments, *(cmd->environment));
 }
 
-error_t     prepare_command(t_sh_cmd *cmd)
+error_t     sh_prepare_cmd(t_sh_cmd *cmd)
 {
     char    **tmp;
 
-    update_arguments(cmd);
+    sh_refresh_args(cmd);
     tmp = cmd->arguments;
     while (tmp && *tmp)
     {
-        if (verify_wildcard(*tmp, QT_NONE))
+        if (verify_wildcard(*tmp, QUOTE_NONE))
             expand_wildcards(tmp++);
         else
-            remove_quotes(tmp++, QT_NONE);
+            remove_quotes(tmp++, QUOTE_NONE);
     }
-    update_command_path(cmd);
+    sh_refresh_executable(cmd);
     if (!cmd->executable && !cmd->redirects)
         return (ERR_NOCMD);
     return (ERR_NONE);
 }
 
-error_t     handle_heredocs(t_sh_node *nd, int *nd, int *hd)
+error_t     sh_traverse_heredocs(t_sh_node *nd, int *nd, int *hd)
 {
     t_error     err;
 
@@ -93,10 +93,10 @@ error_t     handle_heredocs(t_sh_node *nd, int *nd, int *hd)
         return (ERR_HSTOP);
     if (!nd->command)
     {
-        err |= handle_heredocs(nd->left, hd);
-        err |= handle_heredocs(nd->right, hd);
+        err |= sh_traverse_heredocs(nd->left, hd);
+        err |= sh_traverse_heredocs(nd->right, hd);
         return (err);
     }
-    err = open_heredocs(nd->command);
+    err = sh_heredoc_init(nd->command);
     return (err);
 }

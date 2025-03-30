@@ -7,7 +7,7 @@
  * 
  * @return Newly allocated pipe node or NULL if allocation fails
  */
-t_sh_pipe *sh_init_pipes(void)
+t_sh_pipe *sh_init_pipe(void)
 {
   t_sh_pipe *new_pipe;
 
@@ -27,7 +27,7 @@ t_sh_pipe *sh_init_pipes(void)
   }
   // initialize next pointer
   new_pipe->next = NULL;
-  retrun (new_pipe);
+  return (new_pipe);
 }
 /**
  * @brief Pushes a pipe node to the top of a stack
@@ -37,7 +37,7 @@ t_sh_pipe *sh_init_pipes(void)
  * @param head Pointer to the head of the pipe list
  * @param top Node to be added to the top of the list
  */
-void sh_pipes_push(t_sh_pipe **head, t_sh_pipe *top)
+void sh_pipe_push(t_sh_pipe **head, t_sh_pipe *top)
 {
   // validate input pointer
   if(!head || !top)
@@ -60,7 +60,7 @@ void sh_pipes_push(t_sh_pipe **head, t_sh_pipe *top)
  * @param head Pointer to the head of the pipe list
  * @return Removed pipe node
  */
-t_sh_pipe *sh_pipes_pop(t_sh_pipe **head)
+t_sh_pipe *sh_pipe_pop(t_sh_pipe **head)
 {
   t_sh_pipe *tmp;
 

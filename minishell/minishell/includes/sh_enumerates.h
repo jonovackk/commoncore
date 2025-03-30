@@ -10,10 +10,10 @@
  */
 typedef enum e_quote_state
 {
-	QT_NONE = 0,
-	QT_SINGLE,
-	QT_DOUBLE,
-	QT_IGNORE
+	QUOTE_NONE = 0,
+	QUOTE_SINGLE,
+	QUOTE_DOUBLE,
+	QUOTE_IGNORE
 }	t_qstate;
 
 
@@ -36,9 +36,9 @@ typedef enum e_token_kind
  */
 typedef enum redir_t
 {
-	REDIR_IN,
+	REDIR_INPUT,
 	REDIR_HEREDOC,
-	REDIR_OUT,
+	REDIR_OUTPUT,
 	REDIR_APPEND
 } redir_t;
 
@@ -58,11 +58,11 @@ typedef enum exec_t
  */
 typedef enum file_t
 {
-	FILE_HDOC = -3,
-	FILE_HD,
-	FILE_ERR,
-	FILE_OK,
-	FILE_UNK
+	FILE_HEREDOC_TEMP = -3,
+	FILE_HEREDOC,
+	FILE_ERROR,
+	FILE_READY,
+	FILE_UNKNOWN
 } file_t;
 
 /**
@@ -72,9 +72,9 @@ typedef enum file_t
 typedef enum handler_t
 {
 	HANDLER_IGN,
-	HANDLER_INT,
-	HANDLER_DQ,
-	HANDLER_HD
+	HANDLER_INTERRUPT,
+	HANDLER_DQUOTE,
+	HANDLER_HEREDOC
 } handler_t;
 
 /**
@@ -85,24 +85,24 @@ typedef enum handler_t
  typedef enum error_t
  {
 	ERR_NONE,
-	ERR_FAIL,
-	ERR_GEN,
-	ERR_NAN,
-	ERR_ARGS,
-	ERR_UNSET,
-	ERR_NOENT,
-	ERR_INV,
-	ERR_HSTOP,
-	ERR_DQSTOP,
-	ERR_NOCMD,
-	ERR_SYNTQ,
-	ERR_SYNT,
-	ERR_HLIM,
-	ERR_NOPERM,
-	ERR_DIR,
-	ERR_OPT,
-	ERR_FD,
-	ERR_AMB
+	ERR_FAIL_GENERAL,
+	ERR_FAIL_UNKNOWN,
+	ERR_NOT_A_NUMBER,
+	ERR_TOO_MANY_ARGS,
+	ERR_VAR_UNSET,
+	ERR_NO_ENTRY,
+	ERR_INVALID,
+	ERR_HEREDOC_ABORTED,
+	ERR_DQUOTE_ABORTED,
+	ERR_NO_COMMAND,
+	ERR_BAD_QUOTE,
+	ERR_SYNTAX,
+	ERR_HEREDOC_LIMIT,
+	ERR_NO_PERMISS,
+	ERR_IS_DIRECTORY,
+	ERR_INVALID_OPTION,
+	ERR_FD_LIMIT,
+	ERR_AMBIGUOUS_REDIRECT
  } error_t;
 
 #endif

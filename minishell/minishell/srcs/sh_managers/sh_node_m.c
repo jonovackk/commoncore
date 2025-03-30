@@ -40,7 +40,7 @@ void    sh_connect_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_
         *root = sibling;
         return;
     }
-    sh_set_parent_node(root, make_node(cmd, tok), LEFT);
+    sh_set_parent_node(root, sh_create_exec_node(cmd, tok), LEFT);
     sh_set_child_node(root, sibling, RIGHT);
 }
 

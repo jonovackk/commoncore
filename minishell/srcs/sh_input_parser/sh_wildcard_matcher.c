@@ -1,114 +1,201 @@
 #include "../../includes/minishell.h"
 
-int     match_wildcard(const char *fname, const char *pattern)
+/**
+ * @brief Matches a filename against a wildcard pattern.
+ * 
+ * Core responsibilities:
+ * 1. Skip consecutive '*' characters in the pattern.
+ * 2. Check for character matches between the filename and pattern.
+ * 3. Return 1 if the filename matches the pattern, otherwise return 0.
+ * 
+ * @param filename The filename to check.
+ * @param pattern The wildcard pattern.
+ * @return 1 if there's a match, 0 otherwise.
+ */
+int sh_match_wildcard(const char *filename, const char *pattern)
 {
-    const char      *fptr;
-    const char      *rptr;
-    const char      *next;
+    const char *file_ptr;
+    const char *pat_ptr;
+    const char *next_match;
 
-    fptr = fname;
-    rptr = pattern;
-    while (*fptr)
+    file_ptr = filename;
+    pat_ptr = pattern;
+
+    while (*file_ptr)
     {
-        next = NULL;
-        while (*rptr == '*')
-            rptr++;
-        if (!*rptr)
-            return(*(rptr - 1) == '*');
-        if (!ft_strchr(rptr, '*'))
-            next = ft_strchr(fptr, *rptr);
-        else if (rptr != pattern || *rptr == *fptr)
-            next = ft_strchr(fptr, *rptr);
-        if (next)
-            fptr += (next - fptr);
-        else
+        next_match = NULL;
+
+        // Skip all consecutive '*' in the pattern
+        while (*pat_ptr == '*')
+            pat_ptr++;
+
+        // If the pattern is fully consumed, return true if it ended with '*'
+        if (!*pat_ptr)
+            return (*(pat_ptr - 1) == '*');
+
+        // Locate the next occurrence of the current pattern character in the filename
+        if (!ft_strchr(pat_ptr, '*'))
+            next_match = ft_strchr(file_ptr, *pat_ptr);
+        else if (pat_ptr != pattern || *pat_ptr == *file_ptr)
+            next_match = ft_strchr(file_ptr, *pat_ptr);
+
+        // If no match is found, the pattern does not match the filename
+        if (!next_match)
             return (0);
-        while (*fptr && *rptr && *rptr != '*' && *(fptr++) == *(rptr++));
+
+        // Move file pointer to the next match position
+        file_ptr += (next_match - file_ptr);
+
+        // Compare characters until encountering '*' or end of pattern
+        while (*file_ptr && *pat_ptr && *pat_ptr != '*' && *(file_ptr++) == *(pat_ptr++));
     }
-    while (*rptr && *rptr == '*')
-        rptr++;
-    return (!*fptr && !*rptr);
+
+    // Skip any trailing '*' in the pattern
+    while (*pat_ptr == '*')
+        pat_ptr++;
+
+    // Match is valid if both the filename and pattern are fully consumed
+    return (!*file_ptr && !*pat_ptr);
 }
 
-char    **wildcard_files(char *pattern)
+/**
+ * @brief Retrieves filenames matching a wildcard pattern in the current directory.
+ * 
+ * Core responsibilities:
+ * 1. Open the current directory for reading.
+ * 2. Filter filenames that match the given pattern.
+ * 3. Return a dynamically allocated array of matches.
+ * 
+ * @param pattern The wildcard pattern.
+ * @return Array of matching filenames, or NULL if no matches found.
+ */
+char **sh_get_matching_files(char *pattern)
 {
-    char            *cwd;
-    char            **file_list;
-    DIR             *dir_stream;
-    struct dirent   *entry;
+    char *cwd;
+    char **file_list;
+    DIR *dir_stream;
+    struct dirent *entry;
 
-    cwd = ft_get_pwd();
-    dir_stream = opendir(cwd);
+    cwd = ft_get_pwd();  // Get current working directory
+    if (!cwd)
+        return (NULL); // Possible error: `ft_get_pwd()` might return NULL
+
+    dir_stream = opendir(cwd);  // Open directory stream
     if (!dir_stream)
     {
-        ft_error_message(ERR_NOENT, cwd);
+        ft_error_message(ERR_NOENT, cwd); // Print error if directory cannot be opened
         free(cwd);
         return (NULL);
     }
     free(cwd);
+
     file_list = NULL;
-    entry = readdir(dir_stream);
+    entry = readdir(dir_stream);  // Read directory entries
     while (entry)
     {
+        // Ignore hidden files (starting with '.') and match against the wildcard pattern
         if (entry->d_name[0] != '.' && match_wildcard(entry->d_name, pattern))
             ft_strapp(&file_list, ft_strdup(entry->d_name));
+
         entry = readdir(dir_stream);
     }
-    closedir(dir_stream);
+    
+    closedir(dir_stream);  // Close directory stream
     return (file_list);
 }
 
-void    process_wildcard_token(t_sh_token **token_list, t_sh_token **current)
+/**
+ * @brief Expands a wildcard token by replacing it with matching filenames.
+ * 
+ * Core responsibilities:
+ * 1. Tokenize the wildcard pattern.
+ * 2. Replace the original token with the expanded tokens.
+ * 3. Maintain correct token list structure.
+ * 
+ * @param token_list The head of the token list.
+ * @param current The current token being processed.
+ */
+void sh_expd_wildcard_token(t_sh_token **token_list, t_sh_token **current)
 {
-    t_sh_token      *wc_tokens;
-    t_sh_token      *next_token;
-    t_sh_token      *prev_token;
+    t_sh_token *wc_tokens;
+    t_sh_token *next_token;
+    t_sh_token *prev_token;
 
-    next_token = (*current)->next;
-    wc_tokens = ft_tokenizer((*current)->content, QT_NONE);
-    ft_add_token(&wc_tokens, next_token);
-    prev_token = (*current)->prev;
-    ft_del_token(*current);
+    next_token = (*current)->next;  // Store reference to next token
+    wc_tokens = ft_tokenizer((*current)->content, QT_NONE); // Tokenize wildcard content
+    ft_add_token(&wc_tokens, next_token); // Append new tokens to the list
+
+    prev_token = (*current)->prev; // Store reference to previous token
+    ft_del_token(*current); // Remove original wildcard token
+
     if (prev_token)
     {
-        prev_token->next = wc_tokens;
+        prev_token->next = wc_tokens; // Link previous token to expanded tokens
         prev_token = wc_tokens;
-        while (prev_token != next_token);
+
+        while (prev_token != next_token) // Traverse tokens until reaching original next token
             prev_token = prev_token->next;
-        *current = prev_token;
+
+        *current = prev_token; // Update current token position
     }
     else
     {
-        *token_list = wc_tokens;
+        *token_list = wc_tokens; // If no previous token, update head of the list
         *current = next_token;
     }
 }
 
-char        *format_wildcard(char ***file_array)
+/**
+ * @brief Formats a list of filenames into a space-separated string.
+ * 
+ * Core responsibilities:
+ * 1. Sort the filenames for predictable output.
+ * 2. Join them into a single string with spaces.
+ * 3. Return the formatted result.
+ * 
+ * @param file_array Pointer to an array of filenames.
+ * @return Space-separated string of filenames.
+ */
+char *sh_format_wildcard_matches(char ***file_array)
 {
-    char    *formatted;
+    char *formatted;
 
     formatted = NULL;
-    sort_str_array(*file_array, array_len(*file_array));
-    return (join_str_array(*file_array, ft_strdup(" "), 0b10));
+    sort_str_array(*file_array, array_len(*file_array)); // Sort filenames alphabetically
+    return (join_str_array(*file_array, ft_strdup(" "), 0b10)); 
 }
 
-void    expand_wildcards(char **str)
+/**
+ * @brief Expands wildcard patterns in a given string.
+ * 
+ * Core responsibilities:
+ * 1. Remove quotes from the input.
+ * 2. Retrieve matching filenames.
+ * 3. Replace the original string with the expanded matches.
+ * 
+ * @param str Pointer to the string to expand.
+ */
+void sh_replace_wildcards(char **str)
 {
-    char        *file_matches;
-    char        *wild_formatted;
-    char        *dequoted;
+    char *matched_files;
+    char *formatted_output;
+    char *unquoted_str;
 
-    dequoted = ft_strdup(*str);
-    remove_quotes(&dequoted, QT_NONE);
-    file_matches = wildcard_files(dequoted);
-    free(dequoted);
-    if (file_matches && *file_matches)
+    unquoted_str = ft_strdup(*str); // Duplicate original string
+    if (!unquoted_str)
+        return;
+
+    remove_quotes(&unquoted_str, QT_NONE); // Remove any surrounding quotes
+    matched_files = get_matching_files(unquoted_str); // Get files matching the pattern
+    free(unquoted_str);
+
+    if (matched_files && *matched_files) // Ensure there are matches before modifying input
     {
         free(*str);
-        wild_formatted = format_wildcard(&file_matches);
-        *str = ft_strdup(wild_formatted);
-        free(wild_formatted);
+        formatted_output = format_wildcard_matches(&matched_files); // Format matches into a single string
+        *str = ft_strdup(formatted_output);
+        free(formatted_output);
     }
-    free_str_array((void **)(file_matches));
+
+    free_str_array((void **)matched_files); // Free allocated file list
 }

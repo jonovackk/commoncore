@@ -1,132 +1,74 @@
-#ifndef FT_PARSING_H
-# define FT_PARSING_H
+#ifndef SH_INPUT_PARSER_H
+# define SH_INPUT_PARSER_H
 
-# include "ft_dt_struct.h"
+/* sh_input_tokenizer.c */
 
-/**
- * @brief            Quote state updater.
- * 
- * @param c          Current character.
- * @param qstatus    Current quote state address.
- * 
- * @return           1 if quote state changed, 0 otherwise.
-*/
-int            update_quote_status(char c, t_qstate *qstatus);
+int sh_is_shell_operator(char *input, t_qstate qstat);
 
-/**
- * @brief            Tokenize a string.
- * 
- * @param input      String to tokenize.
- * @param qstat      Quote state.
- * 
- * @return           t_token linked list.
-*/
-t_sh_token        *parse_into_tokens(char *input, t_qstate qstat);
+t_token_kind sh_classify_token(char *input, t_qstate qstat);
 
-/**
- * @brief            Check if a string starts by a token.
- * 
- * @param input      String to analyze.
- * @param qstat      Carried quote state.
- * 
- * @return           1 if the string is headed by a token, 0 otherwise.
-*/
-int            is_valid_operator(char *input, t_qstate qstat);
+t_sh_token *sh_tokenize_input(char *input, t_qstate qstat);
 
-/**
- * @brief            Get token type from string.
- * 
- * @param input      String to analyze.
- * @param qstat      Carried quote state.
- * 
- * @return           Token type enumeration value.
-*/
-t_token_kind   get_token_category(char *input, t_qstate qstat);
+int sh_contains_unquoted_wildcard(char *input, t_qstate qstat);
 
-/**
- * @brief            Check if a brace group contains a binary operator.
- * 
- * @param token      Token linked list.
- * 
- * @return           1 in case of valid group, 0 otherwise.
-*/
-int            check_valid_logical_parenthesis(t_sh_token *token);
+void sh_expand_tilde(t_sh_token **token_list, t_envvar *home_var);
 
-/**
- * @brief            Update linked list, deleting useless brace tokens.
- * 
- * @param tokens     Linked list.
-*/
-void           clean_parenthesis_tokens(t_sh_token **tokens);
+/* sh_psng_help.c */
 
-/**
- * @brief            Verify if a string is a wildcard string.
- * 
- * @param input      String to check.
- * @param qstat      Quote state.
- * 
- * @return           1 if the string contains only *, 0 otherwise.
-*/
-int            check_for_wildcard(char *input, t_qstate qstat);
+int sh_update_quote_state(char c, t_qstate *qstatus);
 
-/**
- * @brief            Format tokens (wildcard && quotes).
- * 
- * @param token_list Token linked list address.
- * @param home_var   HOME t_envvar pointer.
-*/
-void           process_home_expansion(t_sh_token **token_list, t_sh_env *home_var);
+int sh_ignoring_quotes(char *str);
 
-/**
- * @brief            Unquoted string len.
- * 
- * @param str        String.
- * 
- * @return           Unquoted len of the string.
-*/
-int            count_chars_without_quotes(char *str);
+void sh_rmv_inv_parentheses(t_sh_token **tokens);
+
+/* sh_quote_procs.c */
+
+void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_qstate state);
+
+t_qstate sh_detect_quotes(char *line, char *end_marker, t_qstate state);
+
+void sh_rmv_quotes(char **line, t_qstate state);
+
+/* sh_token_valid.c */
+
+int sh_validate_subtoken(t_sh_token *token);
+
+int sh_validate_syntax(t_sh_token *token, char **err_token);
+
+int sh_check_parenthesis_balance(t_sh_token *tokens);
+
+int sh_validate_tokens(t_sh_token *tokens, char **err_token);
+
+int sh_check_ops_in_brackets(t_sh_token *token);
+
+/* sh_tree_build.c */
 
 
-/**
- * @brief			Check for syntax error.
- * 
- * @param str		String to check.
- * @param end		String ending.
- * @param qs		Quote_state.
- * 
- * @return			Syntax error char.		
-*/
-t_qstate    quote_error(char *line, char *end_marker, t_qstate state);
+/* sh_var_expand.c */
 
-void    process_wildcard_token(t_sh_token **token_list, t_sh_token **current);
+int sh_get_env_var_length(char *str);
 
-char    **wildcard_files(char *pattern);
+void sh_process_quoted_section(char **s, int *rem, t_qstate *state);
 
-int     match_wildcard(const char *fname, const char *pattern);
+void sh_insert_env_vars(t_sh_env *env, char *s, char ***res_parts, t_qstate state);
 
-int     check_subtoken_validity(t_sh_token *token);
+void sh_replace_env_vars(t_sh_env *env, char **line, t_qstate state);
 
-int     validate_token_sequence(t_sh_token *token, char **err_token);
 
-int     check_bracket_balance(t_sh_token *tokens);
+/* sh_wildcard_matcher.c */
 
-int     verify_tokens(t_sh_token *tokens, char **err_token);
+int sh_match_wildcard(const char *filename, const char *pattern);
 
-int     validate_binop_in_brackets(t_sh_token *token);
+char **sh_get_matching_files(char *pattern);
 
-void enforce_quotes(char **line, int tmp_fd, t_qstate state);
+void sh_expd_wildcard_token(t_sh_token **token_list, t_sh_token **current);
 
-void remove_quotes(char **line, t_qstate state);
+char *sh_format_wildcard_matches(char ***file_array);
 
-int     calc_var_length(char *str);
-
-void    skip_quotes(char **s, int *rem, t_qstate *state);
-
-void    insert_env_variable(t_sh_env *env, char *s, char ***res_parts, t_qstate state);
-
-void     replace_env_vars(t_sh_env *env, char **line, t_qstate state);
+void sh_replace_wildcards(char **str);
 
 
 
 
 #endif
+

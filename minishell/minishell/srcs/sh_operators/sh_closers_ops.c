@@ -90,7 +90,7 @@ void sh_exec_release(t_sh_exec *executor)
   // close and free pipe fd
   while (executor->pipes)
   {
-    current_pipe = sh_pipes_pop(&(executor->pipes));
+    current_pipe = sh_pipe_pop(&(executor->pipes));
     if(current_pipe->fds[0] > STDERR_FILENO)
       close (current_pipe->fds[0]);
     if(current_pipe->fds[1] > STDERR_FILENO)

@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-error_t     open_heredocs(t_sh_cmd *cmd)
+error_t     sh_heredoc_init(t_sh_cmd *cmd)
 {
     error_t     err;
     t_sh_redir  *tmp;
@@ -15,91 +15,91 @@ error_t     open_heredocs(t_sh_cmd *cmd)
             hd_file = get_temp_file(".heredoc", 16);
             if (cmd->heredoc_fd > 2)
                 close(cmd->heredoc_fd);
-            cmd->heredoc_fd = get_heredoc(ft_strdup(tmp->target), hd_file);
-            if (cmd->heredoc_fd == FILE_HDOC)
-                return (ERR_HSTOP);
+            cmd->heredoc_fd = sh_create_heredoc(ft_strdup(tmp->target), hd_file);
+            if (cmd->heredoc_fd == FILE_HEREDOC_TEMP)
+                return (ERR_HEREDOC_ABORTED);
         }
         tmp = tmp->next;
     }
-    return (cmd->heredoc_fd == FILE_ERR);
+    return (cmd->heredoc_fd == FILE_ERROR);
 }
 
-error_t     check_file(t_sh_cmd *cmd, char **file)
+error_t     sh_line_expand(t_sh_cmd *cmd, char **file)
 {
     char    **files;
     char    *var;
 
     var = ft_strdup(*file);
-    replace_env_vars(*cmd->environment, file, QT_NONE);
-    if (verify_wildcar(*file, QT_NONE))
+    replace_env_vars(*cmd->environment, file, QUOTE_NONE);
+    if (verify_wildcar(*file, QUOTE_NONE))
         expand_wildcars(file);
     files = ft_split(*file, ' ');
     if (array_len(files) > 1)
     {
-        print_error_message(ERR_AMB, var);
+        print_error_message(ERR_AMBIGUOUS_REDIRECT, var);
         free(var);
         free(*file);
         free_str_array((void **)files);
-        return (ERR_AMB);
+        return (ERR_AMBIGUOUS_REDIRECT);
     }
     free(var);
     free_str_array((void **) files);
     return (ERR_NONE);
 }
 
-error_t     open_file_fd(t_sh_cmd *cmd, char *file, int mode)
+error_t     sh_heredoc_write(t_sh_cmd *cmd, char *file, int mode)
 {
     int     *fd;
 
-    if (check_file(cmd, &file))
-        return (ERR_AMB);
+    if (sh_line_expand(cmd, &file))
+        return (ERR_AMBIGUOUS_REDIRECT);
     if (mode == OPEN_READ)
         fd = &(cmd->input_fd);
     else
         fd = &(cmd->outfile);
     if (*fd > 2)
         close(*fd);
-    if (mode != OPEN_READ && *fd != FILE_ERR)
+    if (mode != OPEN_READ && *fd != FILE_ERROR)
         *fd = open(file, mode, 0644);
     else if (*fd != -1)
         *fd = open(file, mode);
     if (*fd == -1)
     {
         if (errno == ENFILE)
-            print_error_message(ERR_FD, file);
+            print_error_message(ERR_FD_LIMIT, file);
         else
-            print_error_message(ERR_NOENT, file);
+            print_error_message(ERR_NO_ENTRY, file);
         free(file);
-        return (ERR_FD);
+        return (ERR_FD_LIMIT);
     }
     free(file);
     return (ERR_NONE);
 }
 
-error_t     open_outputs(t_sh_cmd *cmd)
+error_t     sh_output_load(t_sh_cmd *cmd)
 {
     t_sh_redir      *tmp;
     error_t         op;
 
     tmp = cmd->redirects;
     op = ERR_NONE;
-    while (tmp && cmd->outfile != FILE_ERR && op == ERR_NONE)
+    while (tmp && cmd->outfile != FILE_ERROR && op == ERR_NONE)
     {
-        if (tmp->mode == REDIR_IN && access(tmp->target, R_OK))
+        if (tmp->mode == REDIR_INPUT && access(tmp->target, R_OK))
             break;
-        if (tmp->mode == REDIR_OUT)
-            op = open_file_fd(cmd, ft_strdup(tmp->target), OPEN_CREATE);
+        if (tmp->mode == REDIR_OUTPUT)
+            op = sh_heredoc_write(cmd, ft_strdup(tmp->target), OPEN_CREATE);
         else if (tmp->mode == REDIR_APPEND)
-            op = open_file_fd(cmd, ft_strdup(tmp->target), OPEN_APPEND);
-        if (cmd->outfile != FILE_ERR)
+            op = sh_heredoc_write(cmd, ft_strdup(tmp->target), OPEN_APPEND);
+        if (cmd->outfile != FILE_ERROR)
             tmp = tmp->next;
     }
-    if (op == ERR_FD || op == ERR_AMB)
+    if (op == ERR_FD_LIMIT || op == ERR_AMBIGUOUS_REDIRECT)
         return (op);
-    return (cmd->outfile == FILE_ERR && access(tmp->target, R_OK));
+    return (cmd->outfile == FILE_ERROR && access(tmp->target, R_OK));
 }
 
-error_t     open_inputs(t_sh_cmd *cmd, int *hd_last)
+error_t     sh_input_load(t_sh_cmd *cmd, int *hd_last)
 {
     t_sh_redir  *tmp;
     error_t     op;
@@ -109,18 +109,18 @@ error_t     open_inputs(t_sh_cmd *cmd, int *hd_last)
     tmp = cmd->redirect;
     op = ERR_NONE;
     *hd_last = 0;
-    while (tmp && cmd->input_fd != FILE_ERR && op == ERR_NONE)
+    while (tmp && cmd->input_fd != FILE_ERROR && op == ERR_NONE)
     {
-        if (tmp->mode == REDIR_IN)
+        if (tmp->mode == REDIR_INPUT)
         {
             *hd_last = 0;
-            op = open_file_fd(cmd, ft_strdup(tmp->target), OPEN_READ);
+            op = sh_heredoc_write(cmd, ft_strdup(tmp->target), OPEN_READ);
         }
-        if (tmp->mode != REDIR_OUT && tmp->mode != REDIR_APPEND)
+        if (tmp->mode != REDIR_OUTPUT && tmp->mode != REDIR_APPEND)
             *hd_last |= (tmp->mode == REDIR_HEREDOC);
         tmp = tmp->next;
     }
-    if (op == ERR_FD || op == ERR_AMB)
+    if (op == ERR_FD_LIMIT || op == ERR_AMBIGUOUS_REDIRECT)
         return (op);
-    return (cmd->input_fd == FILE_ERR);
+    return (cmd->input_fd == FILE_ERROR);
 }

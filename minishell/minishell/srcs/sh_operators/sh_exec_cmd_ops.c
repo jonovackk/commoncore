@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-void    setup_input(t_sh_cmd *cmd, int last_hd)
+void    sh_setup_input(t_sh_cmd *cmd, int last_hd)
 {
     if (last_hd)
     {
@@ -15,7 +15,7 @@ void    setup_input(t_sh_cmd *cmd, int last_hd)
     }
 }
 
-void    run_cmd(t_sh_cmd *cmd, int *node_fd, t_sh_exec *exec_ctx)
+void    sh_run_cmd(t_sh_cmd *cmd, int *node_fd, t_sh_exec *exec_ctx)
 {
     char    **env_vars;
     pid_t   child_pid;
@@ -28,24 +28,24 @@ void    run_cmd(t_sh_cmd *cmd, int *node_fd, t_sh_exec *exec_ctx)
         env_vars = get_env_strings(*(cmd->environment), 0);
         handle_redirections(cmd, node_fd);
         close_all_pipes(exec_ctx->active_pipes);
-        close_tree_rec(get_tree_holder(0, NULL));
+        sh_tree_fd_cleanup(get_tree_holder(0, NULL));
         execve(cmd->executable, cmd->arguments, env_vars);
     } 
     close_cmd(cmd);
     push_pid(&(exec_ctx->running_procs), t_sh_exec *exec_ctx)
 }
 
-error_t     init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
+error_t     sh_init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 {
     int     last_hd;
 
     last_hd = 0;
-    if (update_command(cmd))
+    if (sh_finalize_cmd(cmd))
     {
         simulate_pid_child(0, exec_ctx);
         return ();
     }
-    if (open_outputs(cmd) || open_inputs(cmd, &last_hd))
+    if (sh_output_load(cmd) || sh_input_load(cmd, &last_hd))
     {
         simulate_pid_child(1, exec_ctx);
         return (ERR_FAIL);
@@ -56,7 +56,7 @@ error_t     init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
         simulate_pid_child(0, exec_ctx);
         return (ERR_FAIL);
     }
-    setup_input(cmd, last_hd);
+    sh_setup_input(cmd, last_hd);
     if (!cmd->executable && cmd->redirects)
     {
         simulate_pid_child(0, exec_ctx);
@@ -65,7 +65,7 @@ error_t     init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
     return (ERR_NONE);
 }
 
-error_t     check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
+error_t     sh_check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 {
     struct stat stat_buf;
 
@@ -84,16 +84,16 @@ error_t     check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
     return (ERR_NONE);
 }
 
-void    handle_command(t_sh_node *tree, int *node_fd, t_sh_exec *exec_ctx, exec_t mode)
+void    sh_handle_command(t_sh_node *tree, int *node_fd, t_sh_exec *exec_ctx, exec_t mode)
 {
     char        *err_str;
     t_sh_cmd    *cmd;
 
     err_str = NULL;
     cmd = tree->command;
-    if (init_command(cmd, exec_ctx) || check_command(cmd, exec_ctx))
+    if (sh_init_command(cmd, exec_ctx) || sh_check_command(cmd, exec_ctx))
         return;
-    if (!builtin_command(cmd, node_fd, exec_ctx, mode))
+    if (!sh_process_builtin(cmd, node_fd, exec_ctx, mode))
         return;
     if (access(cmd->executable, F_OK))
     {
@@ -103,5 +103,5 @@ void    handle_command(t_sh_node *tree, int *node_fd, t_sh_exec *exec_ctx, exec_
         print_error_message(ERR_NOCMD, err_str);
         return;
     }
-    run_cmd(cmd, node_fd, exec_ctx);
+    sh_run_cmd(cmd, node_fd, exec_ctx);
 }

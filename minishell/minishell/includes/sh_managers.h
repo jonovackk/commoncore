@@ -1,5 +1,5 @@
-#ifndef FT_DATA_STRUCT_H
-# define FT_DATA_STRUCT_H
+#ifndef FT_MANAGERS_H
+# define FT_MANAGERS_H
 
 # define LEFT 0
 # define RIGHT 1
@@ -30,7 +30,7 @@ typedef struct s_env_var {
 } t_sh_env;
 
 /**
- * @brief Manages input/output redirections for a command
+ * @brief Manages input/output redirections for a commandsh_init_pipes
  * 
  * Supports various redirection types like input, output, 
  * append, and here-document
@@ -105,23 +105,8 @@ typedef struct s_execution_context {
 
 
 
-typedef struct s_process_id
-{
-  pid_t pid; // identifier
-  struct s_process_id *next; // next process in the tracking list
-} t_sh_pid;
+// sh_create_m.c
 
-typedef struct s_pipe_info
-{
-  int fds[2]; // read and write file descriptors
-  struct s_pipe_info *next; // next pipe in the pipeline
-} t_sh_pipe;
-
-
-
-
-//shell_data_structure
-//builders.c
 /**
  * @brief            Creates a new environment variable.
  * 
@@ -162,7 +147,9 @@ t_sh_node   *sh_create_exec_node(t_sh_cmd *cmd, t_sh_token *token);
  */
 t_sh_token  *sh_create_token(char **text, t_token_kind kind);
 
-//command.c
+
+
+// sh_cmd_m.c
 
 /**
  * @brief            Retrieves the command path from the environment.
@@ -181,7 +168,7 @@ char        *sh_find_path(char *c, t_sh_env *env);
  */
 void    sh_free_cmd(t_sh_cmd *cmd);
 
-//variables.c
+//sh_envvar_m.c
 
 /**
  * @brief            Adds an environment variable to the linked list.
@@ -214,7 +201,7 @@ void    sh_destroy_env_node(t_sh_env *env);
 void    sh_destroy_env_list(t_sh_env *env);
 
 
-//variables_utils.c
+//sh_envvar_utils_m.c
 
 /**
  * @brief            Retrieves an environment variable by name.
@@ -253,7 +240,9 @@ void    sh_update_env(t_sh_env **env, char *key, char *val);
  */
 void    sh_extend_env(t_sh_env **env, char *key, char *val);
 
-//sh_exec.c
+
+
+//sh_exec_m.c
 
 /**
  * @brief            Initializes an execution structure.
@@ -262,7 +251,9 @@ void    sh_extend_env(t_sh_env **env, char *key, char *val);
  */
 t_sh_exec   *sh_exec_init(void);
 
-//sh_pid.c
+
+
+//sh_pid_m.c
 /**
  * @brief            Creates a new process ID structure.
  * 
@@ -270,7 +261,7 @@ t_sh_exec   *sh_exec_init(void);
  * 
  * @return           A pointer to the newly allocated PID structure.
  */
-t_sh_pid    *sh_new_pid(pid_t id);
+t_sh_pid    *sh_init_pid(pid_t id);
 
 /**
  * @brief            Pushes a PID into a stack.
@@ -278,7 +269,7 @@ t_sh_pid    *sh_new_pid(pid_t id);
  * @param list       PID stack.
  * @param proc       Process ID structure to push.
  */
-void  sh_push_pid(t_sh_pid **list, t_sh_pid *proc);
+void        sh_pid_push(t_sh_pid **head, t_sh_pid *top);
 
 /**
  * @brief            Pops a PID from the stack.
@@ -287,23 +278,25 @@ void  sh_push_pid(t_sh_pid **list, t_sh_pid *proc);
  * 
  * @return           Pointer to the popped PID structure.
  */
-t_sh_pid    *sh_pop_pid(t_sh_pid **list);
+t_sh_pid    *sh_pid_pop(t_sh_pid **head);
 
 /**
  * @brief            De-allocate the entire PID stack.
  * 
  * @param list       PID stack to free.
  */
-void  sh_clear_pid_list(t_sh_pid *list);
+void  sh_delete_pid_list(t_sh_pid *pid_list);
 
-//sh_pipes.c
+
+
+//sh_pipe_m.c
 
 /**
  * @brief            Creates a new pipe structure.
  * 
  * @return           A pointer to the newly allocated pipe structure.
  */
-t_sh_pipe   *sh_new_pipe(void);
+t_sh_pipe   *sh_init_pipe(void);
 
 /**
  * @brief            Pushes a pipe into a stack.
@@ -311,7 +304,7 @@ t_sh_pipe   *sh_new_pipe(void);
  * @param list       Pipe stack.
  * @param pipe_obj   Pipe structure to push.
  */
-void  sh_push_pipe(t_sh_pipe **list, t_sh_pipe *pipe_obj);
+void  sh_pipe_push(t_sh_pipe **head, t_sh_pipe *top);
 
 /**
  * @brief            Pops a pipe from the stack.
@@ -320,16 +313,18 @@ void  sh_push_pipe(t_sh_pipe **list, t_sh_pipe *pipe_obj);
  * 
  * @return           Pointer to the popped pipe structure.
  */
-t_sh_pipe   *sh_pop_pipe(t_sh_pipe **list);
+t_sh_pipe   *sh_pipe_pop(t_sh_pipe **head);
 
 /**
  * @brief            De-allocate a pipe structure.
  * 
  * @param p          Pipe structure to free.
  */
-void  sh_free_pipe(t_sh_pipe *p);
+void  sh_delete_pipe(t_sh_pipe *pipe_node);
 
-//sh_redir.c
+
+
+//sh_redir_m.c
 /**
  * @brief            Creates a new redirection structure.
  * 
@@ -355,7 +350,9 @@ void  sh_add_redir(t_sh_redir **list, t_sh_redir *new_redir);
  */
 void  sh_clear_redir_list(t_sh_redir *redir);
 
-//sh_token.c
+
+
+//sh_token_m.c
 /**
  * @brief            Adds a token to the linked list.
  * 
@@ -393,85 +390,6 @@ void      sh_token_free(t_sh_token *tok);
  * @param list       Token linked list to free.
  */
 void      sh_free_token_list(t_sh_token *list);
-
-//sh_tree.c
-
-/**
- * @brief            Inserts a node as a parent (Parent-wise insertion).
- * 
- * @param tree       Current root node, future child.
- * @param root       New root node.
- * @param side       Side where tree will be inserted.
- */
-void    sh_insert_parent(t_sh_node **tree, t_sh_node *root, int side);
-
-/**
- * @brief            Inserts a node as a child (Child-wise insertion).
- * 
- * @param tree       Current root node, future parent.
- * @param child      New child node.
- * @param side       Side where child will be inserted.
- */
-void    sh_insert_child(t_sh_node **tree, t_sh_node *child, int side);
-
-/**
- * @brief            Associates two nodes into one tree and sets tree to 
- *                   newly allocated parent.
- * 
- * @param tree       Node 1, future left child.
- * @param neigh      Node 2, future right child.
- * @param cmd        New root command element.
- * @param tok        New root token element.
- */
-void    sh_associate(t_sh_node *tree, t_sh_node *neigh, t_sh_cmd *cmd, t_sh_token *tok);
-
-/**
- * @brief            De-allocate a node.
- * 
- * @param tree       Node to free.
- */
-void    sh_del_node(t_sh_node *tree);
-
-/**
- * @brief            De-allocate an entire tree recursively.
- * 
- * @param tree       Tree to free.
- */
-void    sh_clear_tree(t_sh_node *tree);
-
-
-
-void    sh_set_parent_node(t_sh_node **root, t_sh_node *new_parent, int pos);
-
-void    sh_set_child_node(t_sh_node **root, t_sh_node *child, int pos);
-
-void    sh_connect_nodes(t_sh_node **root, t_sh_node *sibling, t_sh_cmd *cmd, t_sh_token *tok);
-
-void        sh_destroy_node(t_sh_node *node);
-
-void        sh_destroy_tree(t_sh_node *node);
-
-t_sh_pid *sh_init_pid(pid_t pid);
-
-void sh_pid_push(t_sh_pid **head, t_sh_pid *top);
-
-t_sh_pid *sh_pid_pop(t_sh_pid **head);
-
-void sh_delete_pid_list(t_sh_pid *pid_list);
-
-t_sh_pipe *sh_init_pipes(void);
-
-void sh_pipes_push(t_sh_pipe **head, t_sh_pipe *top);
-
-t_sh_pipe *sh_pipes_pop(t_sh_pipe **head);
-
-void sh_delete_pipe(t_sh_pipe *pipe_node);
-
-
-
-
-
-
 
 
 #endif

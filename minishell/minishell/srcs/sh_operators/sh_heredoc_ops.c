@@ -11,12 +11,12 @@
 void sh_handle_heredoc_limit(t_sh_token *tokens, t_sh_env **environment)
 {
   // display heredoc limit error
-  sh_error_display(ERROR_HEREDOC_LIMIT, NULL);
+  sh_error_display(ERR_HEREDOC_LIMIT, NULL);
   // cleanup resources
   sh_cleanup_token_list(tokens);
   sh_destroy_env_list(*environment);
   //exit whit error status
-  exit(ERROR_CRITICAL);
+  exit(ERR_FAIL_UNKNOWN);
 }
 
 /**
@@ -43,7 +43,7 @@ void sh_parse_heredoc_line(char **line, int fd, int expand)
     write(fd, "\n", 1);
   // free current line and read next
   free(*line);
-  *line = readline(HEREDOC_PROMPT); 
+  *line = readline(RD_HEREDOC); 
 }
 
 
@@ -65,13 +65,13 @@ int sh_process_heredoc_line(char *delimiter, char *temp_file, int fd)
   if (fd == -1)
   {
     free(delimiter);
-    return(ERROR_PROCESSING_FAILED);
+    return(ERR_FAIL_GENERAL);
   }
   line = NULL;
   // determine if var expansion is needed
   should_expand = !(ft_strchr(delimiter, '"') || ft_strchr(delimiter, '\''));
   // remove quotes from frlimiter
-  sh_remove_quotes(&delimiter, QUOTE_NEUTRAL);
+  sh_remove_quotes(&delimiter, QUOTE_NONE);
   // store tmp file and delimiter for signal handling
   sh_set_heredoc_holder(temp_file, 0);
   sh_set_heredoc_holder(delimiter, 1);
@@ -90,9 +90,9 @@ int sh_process_heredoc_line(char *delimiter, char *temp_file, int fd)
   free(temp_file);
   //handle empty input
   if (!line)
-    return(ERROR_PROCESSING_FAILED);
+    return(ERR_FAIL_GENERAL);
   free(line);
-  return(ERROR_NONE);
+  return(ERR_NONE);
 }
 /**
  * @brief Handles heredoc process exit scenarios
@@ -113,9 +113,9 @@ int sh_handle_heredoc_exit(char *delimiter, char *temp_file, int exit_status)
   if (exit_status == 1)
   {
     // rmv quote from delimiter
-    sh_remove_quotes(&delimiter, QUOTE_NEUTRAL);
+    sh_remove_quotes(&delimiter, QUOTE_NONE);
     //display heredoc stop error
-    sh_error_display(ERROR_HEREDOC_STOP, delimiter);
+    sh_error_display(ERR_HEREDOC_ABORTED, delimiter);
   }
   else if (exit_status == 130)
   {
@@ -124,7 +124,7 @@ int sh_handle_heredoc_exit(char *delimiter, char *temp_file, int exit_status)
     free(temp_file);
     // set global exit value
     g_shell_exit_status = 130;
-    return(HEREDOC_INTERRUPTED);
+    return(FILE_HEREDOC_TEMP);
   }
   // open and return fd
   fd = open(temp_file, O_RDONLY);
@@ -149,7 +149,7 @@ int sh_create_heredoc(char *delimiter, char *temp_file)
     int fd;
     int error_code;
     // temporarily ignore signals
-    sh_configure_signal_state(SIGNAL_IGNORE);
+    sh_configure_signal_state(HANDLER_IGN);
     // fork heredoc process
     heredoc_pid = fork();
     if (heredoc_pid == -1)
@@ -159,7 +159,7 @@ int sh_create_heredoc(char *delimiter, char *temp_file)
     {
         // prepare for signal handling
         rl_catch_signals = 1;
-        sh_configure_signal_state(SIGNAL_HEREDOC);
+        sh_configure_signal_state(HANDLER_HEREDOC);
         // create temporary file
         fd = open(temp_file, O_CREAT | O_EXCL | O_WRONLY, 0600);
         // cleanup resources
@@ -178,7 +178,7 @@ int sh_create_heredoc(char *delimiter, char *temp_file)
     }
     // parent process
     waitpid(heredoc_pid, &error_code, 0);
-    sh_configure_signal_state(SIGNAL_INTERACTIVE);
+    sh_configure_signal_state(HANDLER_INTERRUPT);
     // handle and return heredoc result
     return sh_handle_heredoc_exit(delimiter, temp_file, error_code);
 }
