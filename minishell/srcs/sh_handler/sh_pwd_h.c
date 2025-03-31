@@ -63,7 +63,7 @@ int     sh_execute_pwd(t_sh_cmd *cmd)
     else
     {
         perror("getcwd() error");
-        return (ERR_FAIL);  // Return error if getcwd fails
+        return (ERR_FAIL_GENERAL);  // Return error if getcwd fails
     }
     return (ERR_NONE);  // Return success
 }
@@ -91,7 +91,7 @@ char    *sh_get_prompt(t_sh_env *envp)
     // Retrieve the current working directory (PWD) from the environment
     if (sh_find_env(saved_env, "PWD"))
     {
-        pwd = trim_pwd(sh_find_env(saved_env, "PWD")->values[0]);
+        pwd = sh_trim_pwd(sh_find_env(saved_env, "PWD")->values[0]);
         pwd = ft_strjoin(pwd, " ~ ", 0, 0b01);  // Append " ~ " to the path
     }
     else
@@ -99,9 +99,9 @@ char    *sh_get_prompt(t_sh_env *envp)
     
     // Construct the prompt based on the exit code
     if (!g_exit_code)
-        prompt = ft_strjoin(P_SUCCESS, P_TAIL, 0, 0b00);  // Success exit code
+        prompt = ft_strjoin(RD_APPENDS, RD_OUTPUTS, 0, 0b00);  // Success exit code
     else
-        prompt = ft_strjoin(P_FAIL, P_TAIL, 0, 0b00);  // Failure exit code
+        prompt = ft_strjoin(RD_INFILES, RD_OUTPUTS, 0, 0b00);  // Failure exit code
     
     // Combine the prompt with the current working directory
     prompt = ft_strjoin(prompt, pwd, 0, 3);

@@ -25,7 +25,7 @@ void    sh_run_cmd(t_sh_cmd *cmd, int *node_fd, t_sh_exec *exec_ctx)
         return;
     if (child_pid == 0)
     {
-        env_vars = get_env_strings(*(cmd->environment), 0);
+        env_vars = sh_create_env_array(*(cmd->environment), 0);
         handle_redirections(cmd, node_fd);
         close_all_pipes(exec_ctx->active_pipes);
         sh_tree_fd_cleanup(get_tree_holder(0, NULL));
@@ -48,19 +48,19 @@ error_t     sh_init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
     if (sh_output_load(cmd) || sh_input_load(cmd, &last_hd))
     {
         simulate_pid_child(1, exec_ctx);
-        return (ERR_FAIL);
+        return (ERR_FAIL_GENERAL);
     }
     setup_input(cmd, last_hd);
     if (!cmd->executable && cmd->redirects)
     {
         simulate_pid_child(0, exec_ctx);
-        return (ERR_FAIL);
+        return (ERR_FAIL_GENERAL);
     }
     sh_setup_input(cmd, last_hd);
     if (!cmd->executable && cmd->redirects)
     {
         simulate_pid_child(0, exec_ctx);
-        return (ERR_FAIL);
+        return (ERR_FAIL_GENERAL);
     }
     return (ERR_NONE);
 }
@@ -75,11 +75,11 @@ error_t     sh_check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
     if (!S_ISREG(stat_buf.st_mode))
     {
         if (S_ISFIFO(stat_buf.st_mode))
-            print_error_message(ERR_NOPERM, cmd->executable);
+            sh_display_error(ERR_NO_PERMISS, cmd->executable);
         else if (S_ISDIR(stat_buf.st_mode))
-            print_error_message(ERR_DIR, cmd->executable);
+            sh_display_error(ERR_IS_DIRECTORY, cmd->executable);
         simulate_pid_child(126, exec_ctx);
-        return(ERR_FAIL);
+        return(ERR_FAIL_GENERAL);
     }
     return (ERR_NONE);
 }
@@ -100,7 +100,7 @@ void    sh_handle_command(t_sh_node *tree, int *node_fd, t_sh_exec *exec_ctx, ex
         simulate_pid_child(127, exec_ctx);
         if (cmd->arguments && *cmd->arguments)
             err_str = *cmd->arguments;
-        print_error_message(ERR_NOCMD, err_str);
+        sh_display_error(ERR_NO_COMMAND, err_str);
         return;
     }
     sh_run_cmd(cmd, node_fd, exec_ctx);

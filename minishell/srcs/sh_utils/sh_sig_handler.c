@@ -88,7 +88,7 @@ void sh_signal_heredoc_mode (int signal)
       // rmv tmp herecod file
       unlink(sh_get_heredoc_holder(NULL, 0));
       // cleanup environment
-      sh_destroy_env_list(sh_update_environment(NULL));
+      sh_destroy_env_list(sh_env_context(NULL));
       // free heredoc related resources
       free(sh_get_heredoc_holder(NULL, 0));
       free(sh_get_heredoc_holder(NULL, 1));
@@ -118,10 +118,8 @@ void sh_configure_signal_state(int mode)
   static struct termios terminal_settings;
   //array of signal handlers for diffrent modes
   static void (*signal_handlers[4])(int) = {
-    [SIGNAL_IGNORE] = sh_signal_ignore,
-    [SIGNAL_INTERACTIVE] = sh_signal_interactive,
-    [SIGNAL_QUOTE_MODE] = sh_signal_quote_mode,
-    [SIGNAL_HEREDOC_MODE] = sh_signal_heredoc_mode
+    sh_signal_ignore, sh_signal_interactive, sh_signal_quote_mode, 
+      sh_signal_heredoc_mode
   };
   // capture current terminal settings
   tcgetattr(STDIN_FILENO, &terminal_settings);

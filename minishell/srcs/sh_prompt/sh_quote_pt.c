@@ -82,7 +82,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
   {
     // prepare for signal handling
     rl_catch_signals = 1;
-    sh_configure_signal_state(SIGNAL_QUOTE_MODE);
+    sh_configure_signal_state(HANDLER_DQUOTE);
     // create tmp file
     tmp_fd = open (tmp, O_CREAT | O_EXCL | O_WRONLY, 0600);
     // store fd for later use
@@ -94,7 +94,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
     // write original line to tmp file
     write (tmp_fd, line, ft_strlen(line));
     // processe quote-related operations
-    sh_quote_enforcer(&line, tmp_fd, QUOTE_NEUTRAL);
+    sh_handle_unclosed_quotes(&line, tmp_fd, QUOTE_NONE);
     free(line);
     //close all fd's
     sh_close_multiple_fd(4, tmp_fd,
@@ -127,12 +127,12 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
   char *quote_str;
   // validate input line
   if (!*line)
-    return (ERROR_CRITICAL);
+    return (ERR_NO_COMMAND);
   history_line = *line;
   // create tmp file for quote processing
   dquote_file = sh_create_tempfile(".dquote", 16);
   // check if quote processing is needed
-  if (sh_check_quote_error(*line, NULL, QUOTE_NEUTRAL))
+  if (sh_detect_quotes(*line, NULL, QUOTE_NONE))
   {
     // process quote input
     status = sh_get_dquote(*line, env, dquote_file);
@@ -146,12 +146,12 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
   if (WEXISTSTATUS(status) == 130)
   {
     free (*line);
-    return (ERROR_PROCESSING_FAILED);
+    return (ERR_FAIL_GENERAL);
   }
   // final quote error check
   quote_str = ft_strdup(" ");
-  if (sh_check_quote_error(*line, quote_str, QUOTE_NEUTRAL))
-    sh_error_display(ERROR_QUOTE_STOP, quote_str);
+  if (sh_detect_quotes(*line, quote_str, QUOTE_NONE))
+    sh_display_error(ERR_DQUOTE_ABORTED, quote_str);
   free(quote_str);
-  return (ERROR_NONE);
+  return (ERR_NONE);
  }

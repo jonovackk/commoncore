@@ -67,7 +67,7 @@ int sh_validate_syntax(t_sh_token *token, char **err_token)
     while (token->next)
     {
         *err_token = token->next->str;
-        if (!check_subtoken_validity(token))
+        if (!sh_validate_subtoken(token))
             return (0);
         token = token->next;
     }
@@ -125,8 +125,8 @@ int sh_validate_tokens(t_sh_token *tokens, char **err_token)
     *err_token = tokens->str;
 
     // Ensure correct token sequence and balanced brackets
-    if (!validate_token_sequence(tokens, err_token) || !check_bracket_balance(tokens))
-        return (ERR_FAILED);
+    if (!sh_validate_syntax(tokens, err_token) || !sh_check_parenthesis_balance(tokens))
+        return (ERR_FAIL_GENERAL);
 
     current = tokens;
     here_doc_count = 0;

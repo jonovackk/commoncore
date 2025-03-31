@@ -14,7 +14,7 @@ void    sh_execute_builtin_piped(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, 
         return;
     else if (child == 0)
     {
-        if (builtin_func == &exit_builtin)
+        if (builtin_func == &sh_execute_exit)
         {
             close_exec(exec_ctx);
             free(exec_ctx);
@@ -24,7 +24,7 @@ void    sh_execute_builtin_piped(int(*builtin_func)(t_sh_cmd *), t_sh_cmd *cmd, 
         close_exec(exec_ctx);
         sh_tree_fd_cleanup(get_tree_holder(0, NULL));
         free(exec_ctx);
-        if (builtin_func != &exit_builtin)
+        if (builtin_func != &sh_execute_exit)
             fork_exit(exec_ctx);
         exit(ret);
     }
@@ -36,7 +36,7 @@ void    sh_validate_builtin_direct(int (*builtin_func)(t_sh_cmd *), t_sh_cmd, t_
 {
     int     err_code;
 
-    if (builtin_func == &exit_builtin && array_len(cmd->arguments) <= 2)
+    if (builtin_func == &sh_execute_exit && array_len(cmd->arguments) <= 2)
     {
         sh_tree_fd_cleanup(get_tree_holder(0, NULL));
         close_exec(exec_ctx);
@@ -62,9 +62,9 @@ error_t     sh_validate_builtin_flags(t_sh_cmd *cmd)
         tmp++;
     if (*tmp)
     {
-        print_error_message(ERR_OPT,*tmp);
+        sh_display_error(ERR_INVALID_OPTION,*tmp);
         g_exit_code = 125;
-        return (ERR_OPT);
+        return (ERR_INVALID_OPTION);
     }
     return (ERR_NONE);
 }
@@ -74,8 +74,8 @@ error_t     sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec
     char    *trim;
     int     index;
     static int  (*builtins[7])(t_sh_cmd *) = {
-        &cd_builtin, &pwd_builtin, &echo_builtin,
-        &env_builtin, &export_builtin, &unset_builtin, &exit_builtin
+        &sh_execute_cd, &sh_execute_pwd, &sh_echo_execute,
+        &sh_execute_env, &sh_execute_export, &sh_execute_unset, &sh_execute_exit
     };
     static char *builtin_strs[8] = {
         "cd", "pwd", "echo", "env", "export", "unset", "exit", NULL

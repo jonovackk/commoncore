@@ -54,7 +54,7 @@ void sh_process_quoted_section(char **s, int *rem, t_qstate *state)
 {
     while (*s && **s && ((*rem) > 0))
     {
-        ft_qs_update(*((*s)++), state);  // Update the quote state for the current character.
+        sh_update_quote_state(*((*s)++), state);  // Update the quote state for the current character.
         (*rem)--;  // Decrement the remaining length.
     }
 }
@@ -92,7 +92,7 @@ void sh_insert_env_vars(t_sh_env *env, char *s, char ***res_parts, t_qstate stat
         return;
 
     // Calculate the length of the environment variable's key.
-    key_len = calc_var_length(s - 1);
+    key_len = sh_get_env_var_length(s - 1);
 
     // Handle the case where the key starts with a quote.
     if (ft_strchr("\"'", *s))
@@ -110,7 +110,7 @@ void sh_insert_env_vars(t_sh_env *env, char *s, char ***res_parts, t_qstate stat
     if (!env_var)
         ft_strapp(res_parts, ft_strdup(""));
     else
-        ft_strapp(res_parts, ft_get_env_value(env_var, 0, 0));
+        ft_strapp(res_parts, sh_format_env_var(env_var, 0, 0));
 
     // Free the allocated memory for the key.
     free(key);
@@ -147,20 +147,20 @@ void sh_replace_env_vars(t_sh_env *env, char **line, t_qstate state)
         ft_strapp(&parts, ft_strndup(ptr, seg_len));  // Append the segment to parts.
 
         // Skip any quoted sections.
-        skip_quotes(&ptr, &seg_len, &state);
+        sh_process_quoted_section(&ptr, &seg_len, &state);
 
         // If no more characters are left, break.
         if (!*ptr)
             break;
 
         // If the state is not a single quote and the variable length is greater than 1, process the environment variable.
-        if (state != QT_SINGLE && calc_var_length(ptr) > 1)
-            insert_env_variable(env, ptr, &parts, state);
+        if (state != QUOTE_SINGLE && sh_get_env_var_length(ptr) > 1)
+        sh_insert_env_vars(env, ptr, &parts, state);
         else
-            ft_strapp(&parts, ft_strndup(ptr, calc_var_length(ptr)));  // Append non-variable part.
+            ft_strapp(&parts, ft_strndup(ptr, sh_get_env_var_length(ptr)));  // Append non-variable part.
 
         // Move the pointer forward by the length of the processed variable.
-        ptr += calc_var_length(ptr);
+        ptr += sh_get_env_var_length(ptr);
     }
 
     // Free the old line and join the parts into the new line.

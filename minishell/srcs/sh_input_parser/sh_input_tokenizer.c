@@ -22,7 +22,7 @@ int sh_is_shell_operator(char *input, t_qstate qstat)
     if (!input || !*input)
         return (1); // Return 1 if input is empty
 
-    if (ft_isspace(*input) && qstat == QT_NONE)
+    if (ft_isspace(*input) && qstat == QUOTE_NONE)
         return (1); // Ignore leading whitespace if not inside quotes
 
     // Iterate through the list of operators to find a match
@@ -46,7 +46,7 @@ int sh_is_shell_operator(char *input, t_qstate qstat)
  */
 t_token_kind sh_classify_token(char *input, t_qstate qstat)
 {
-    if (qstat != QT_NONE)
+    if (qstat != QUOTE_NONE)
         return (TOKEN_TEXT); // If inside quotes, treat as plain text
 
     // Check for parentheses
@@ -93,13 +93,13 @@ t_sh_token *sh_tokenize_input(char *input, t_qstate qstat)
         return (NULL); // Return NULL if input is empty
 
     current_pos = input;
-    token_length = is_valid_operator(current_pos, qstat);
+    token_length = sh_is_shell_operator(current_pos, qstat);
 
     // Skip spaces and update quote state while processing input
     while (*current_pos && (!token_length || (ft_isspace(*current_pos) && qstat != QT_NONE)))
     {
-        update_quote_status(*(current_pos++), &qstat);
-        token_length = is_valid_operator(current_pos, qstat);
+        sh_update_quote_state(*(current_pos++), &qstat);
+        token_length = sh_is_shell_operator(current_pos, qstat);
     }
 
     // Extract token based on position in the input string
@@ -109,7 +109,7 @@ t_sh_token *sh_tokenize_input(char *input, t_qstate qstat)
         token_content = ft_strndup(input, current_pos - input);
 
     if (ft_strncmp(token_content, " ", 2)) // Ignore standalone spaces as tokens
-        result = create_token(ft_strdup(token_content), get_token_category(input, qstat));
+        result = sh_create_token(ft_strdup(token_content), sh_classify_token(input, qstat));
 
     // Recursively parse the rest of the input
     append_token(&result, parse_into_tokens(input + ft_strlen(token_content), qstat));
@@ -137,10 +137,10 @@ int sh_contains_unquoted_wildcard(char *input, t_qstate qstat)
     current_pos = input;
     while (*current_pos)
     {
-        update_quote_status(*current_pos, &qstat);
+        sh_update_quote_state(*current_pos, &qstat);
 
         // If '*' is found and not inside quotes, return true
-        if (*current_pos == '*' && qstat == QT_NONE)
+        if (*current_pos == '*' && qstat == QUOTE_NONE)
             return (1);
 
         current_pos++;
@@ -172,7 +172,7 @@ void sh_expand_tilde(t_sh_token **token_list, t_envvar *home_var)
             if (home_var)
             {
                 free(current->str);
-                current->str = get_environment_value(home_var, 0, 0);
+                current->str = sh_format_env_var(home_var, 0, 0);
             }
             current = current->next;
         }

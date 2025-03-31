@@ -10,41 +10,41 @@
  * @param str Additional error context string
  */
 
- static void sh_display_extended_errors(t_error err, char *str)
+ static void sh_display_extended_errors(error_t err, char *str)
 {
   // Command not found error
-  if (err == ERROR_COMMAND_NOT_FOUND)
+  if (err == ERR_NO_COMMAND)
   {
-    ft_dprintf(2, "%s", SHELL_ERROR_PREFIX);
+    ft_dprintf(2, "%s", PROMPT_ERROR);
     if (str)
       ft_dprintf(2, "%s", str);
     ft_dprintf(2, ": command not found\n");    
   }
   
   // Syntax quote error
-  if (err == ERROR_SYNTAX_QUOTE)
-    ft_dprintf(2, ERROR_SYNTAX_QUOTE_MSG, SHELL_ERROR_PREFIX, str);
+  if (err == ERR_BAD_QUOTE)
+    ft_dprintf(2, ERR_MSG_SYNTAX_ERROR_QUOTE,  PROMPT_ERROR, str);
   
   // Syntax token error
-  if (err == ERROR_SYNTAX_TOKEN)
+  if (err == ERR_SYNTAX)
   {
     if (str)
-      ft_dprintf(2, ERROR_SYNTAX_TOKEN_MSG, SHELL_ERROR_PREFIX, str);
+      ft_dprintf(2, ERR_MSG_SYNTAX_ERROR_TOKEN,  PROMPT_ERROR, str);
     else
-      ft_dprintf(2, ERROR_SYNTAX_TOKEN_GENERIC_MSG, SHELL_ERROR_PREFIX);
+      ft_dprintf(2, ERR_MSG_SYNTAX_ERROR,  PROMPT_ERROR);
   }
   
   // Heredoc limit error
-  if (err == ERROR_HEREDOC_LIMIT)
-    ft_dprintf(2, ERROR_HEREDOC_LIMIT_MSG, SHELL_ERROR_PREFIX);
+  if (err == ERR_HEREDOC_LIMIT)
+    ft_dprintf(2, ERR_MSG_HEREDOC_LIMIT_EXCEEDED,  PROMPT_ERROR);
   
   // Invalid file descriptor error
-  if (err == ERROR_INVALID_FD)
-    ft_dprintf(2, ERROR_INVALID_FD_MSG, SHELL_ERROR_PREFIX, str);
+  if (err == ERR_FD_LIMIT)
+    ft_dprintf(2, ERR_MSG_HEREDOC_LIMIT_EXCEEDED,  PROMPT_ERROR, str);
   
   // Ambiguous redirection error
-  if (err == ERROR_AMBIGUOUS_REDIRECT)
-    ft_dprintf(2, ERROR_AMBIGUOUS_REDIRECT_MSG, SHELL_ERROR_PREFIX, str);
+  if (err == ERR_AMBIGUOUS_REDIRECT)
+    ft_dprintf(2, ERR_MSG_AMBIGUOUS_REDIRECT,  PROMPT_ERROR, str);
   
   // Reset terminal
   ft_dprintf(2, "\001\033[0m\002");
@@ -58,38 +58,38 @@
  * @param str Context string for the error
  */
 
-void sh_display_error(t_error err, char *str)
+void sh_display_error(error_t err, char *str)
 {
   // env var not set
-  if (err == ERROR_ENV_VAR_NOT_SET)
-    ft_dprintf(2, ERROR_ENV_VAR_NOT_SET_MSG, SHELL_ERROR_PREFIX, str);
+  if (err == ERR_VAR_UNSET)
+    ft_dprintf(2, ERR_MSG_VAR_NOT_SET,  PROMPT_ERROR, str);
   // dir not found
-  if (err == ERROR_DIR_NOT_FOUND)
-    ft_dprintf(2, ERROR_DIR_NOT_FOUND_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_NO_ENTRY)
+    ft_dprintf(2, ERR_MSG_NO_SUCH_FILE_OR_DIR, PROMPT_ERROR, str);
   // too many args
-  if (err == ERROR_TOO_MANY_ARGS)
-    ft_dprintf(2, ERROR_TOO_MANY_ARGS_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_TOO_MANY_ARGS)
+    ft_dprintf(2, ERR_MSG_TOO_MANY_ARGS, PROMPT_ERROR, str);
   // not a nbr
-  if (err == ERROR_NOT_NUMERIC)
-    ft_dprintf(2, ERROR_NOT_NUMERIC_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_NOT_A_NUMBER)
+    ft_dprintf(2, ERR_MSG_NUMERIC_ARG_REQUIRED, PROMPT_ERROR, str);
   // invalid value
-  if (err == ERROR_INVALID_VALUE)
-    ft_dprintf(2, ERROR_INVALID_VALUE_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_INVALID)
+    ft_dprintf(2, ERR_MSG_INVALID_IDENTIFIER, PROMPT_ERROR, str);
   //permission denied
-  if (err == ERROR_PERMISSION_DENIED)
-    ft_dprintf(2, ERROR_PERMISSION_DENIED_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_NO_PERMISS)
+    ft_dprintf(2, ERR_MSG_PERMISSION_DENIED, PROMPT_ERROR, str);
   // is a directory
-  if (err == ERROR_IS_DIRECTORY)
-    ft_dprintf(2, ERROR_IS_DIRECTORY_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_IS_DIRECTORY)
+    ft_dprintf(2, ERR_MSG_IS_A_DIRECTORY, PROMPT_ERROR, str);
   // invalid option
-  if (err == ERROR_INVALID_OPTION)
-    ft_dprintf(2, ERROR_INVALID_OPTION_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_INVALID_OPTION)
+    ft_dprintf(2, ERR_MSG_INVALID_OPTION, PROMPT_ERROR, str);
   // heredoc stop
-  if (err == ERROR_HEREDOC_STOP)
-    ft_dprintf(2, ERROR_HEREDOC_STOP_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_HEREDOC_ABORTED)
+    ft_dprintf(2, ERR_MSG_HEREDOC_EOF, PROMPT_WARNING, str);
   // double quote stop
-  if (err == ERROR_DQUOTE_STOP)
-    ft_dprintf(2, ERROR_DQUOTE_STOP_MSG,SHELL_ERROR_PREFIX, str);
+  if (err == ERR_DQUOTE_ABORTED)
+    ft_dprintf(2, ERR_MSG_UNEXPECTED_EOF, PROMPT_WARNING, str);
   // call extended error handler
   sh_display_extended_errors(err, str);
 }

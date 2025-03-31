@@ -28,7 +28,7 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_qstate state)
 
     // Traverse line and update quote state
     while (**line)
-        update_quote_state(*((*line)++), &state);
+        sh_update_quote_state(*((*line)++), &state);
 
     // If an unclosed quote remains, retrieve additional input
     if (state)
@@ -43,7 +43,7 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_qstate state)
 
         // Append new input to original line and enforce quotes again
         dq_buf = join_str(orig, dq_buf, "\n", 0b11);
-        enforce_quotes(&dq_buf, tmp_fd, QU_ZERO);
+        sh_handle_unclosed_quotes(&dq_buf, tmp_fd, QUOTE_NONE);
         set_dq_holder(dq_buf, 0);
         *line = dq_buf;
         return;
@@ -68,12 +68,12 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_qstate state)
 t_qstate sh_detect_quotes(char *line, char *end_marker, t_qstate state)
 {
     while (*line)
-        update_quote_state(*(line++), &state);
+        sh_update_quote_state(*(line++), &state);
 
     // If an end marker is provided, store the type of unclosed quote
-    if (end_marker && state == QU_SINGLE)
+    if (end_marker && state == QUOTE_SINGLE)
         *end_marker = '\'';
-    else if (end_marker && state == QU_DOUBLE)
+    else if (end_marker && state == QUOTE_DOUBLE)
         *end_marker = '"';
 
     return state;
@@ -100,7 +100,7 @@ void sh_rmv_quotes(char **line, t_qstate state)
     ptr = *line;
 
     // Allocate space for the result string without quotes
-    result = malloc((dq_strlen(*line) + 1) * sizeof(char));
+    result = malloc((sh_ignoring_quotes(*line) + 1) * sizeof(char));
     if (!result)
         return;
 
@@ -109,7 +109,7 @@ void sh_rmv_quotes(char **line, t_qstate state)
     while (*ptr)
     {
         // Skip quotes while updating the quote state
-        if (update_quote_state(*ptr, &state))
+        if (sh_update_quote_state(*ptr, &state))
         {
             ptr++;
             continue;

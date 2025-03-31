@@ -21,33 +21,33 @@ error_t sh_process_line(char **i_line, t_sh_env **env)
   int proc_error;
 
   // generate and display prompt
-  p_str = sh_create_prompt_string(*env);
+  p_str = sh_get_prompt(*env);
   *i_line = readline(p_str);
   free (p_str);
   // validate input
   if (*i_line && sh_is_empty(*i_line))
   {
     free(*i_line);
-    return (ERROR_PROCESSING_FAILED);
+    return (ERR_FAIL_GENERAL);
   }
   // tmp ignore signals during processing
-  sh_signal_set_state(SIGNAL_IGNORE);
+  sh_configure_signal_state(HANDLER_IGN);
   // preocess quote-related aspects of input
   proc_error = sh_handle_quote_input(i_line, env, 0);
   //restore normal signal handling
-  sh_signal_set_state(SIGNAL_INTERACTIVE);
+  sh_configure_signal_state(HANDLER_INTERRUPT);
   // handle specific error scenarios
-  if (proc_error == ERROR_CRITICAL)
+  if (proc_error == ERR_NO_COMMAND)
   {
     sh_destroy_env_list(*env);
-    sh_exit(NULL);
+    sh_execute_exit(NULL);
   }
-  else if (proc_error == ERROR_PROCESSING_FAILED || !*i_line)
+  else if (proc_error == ERR_FAIL_GENERAL || !*i_line)
   {
     g_shell_exit_status = 130;
-    return (ERROR_QUOTE_STOP);
+    return (ERR_DQUOTE_ABORTED);
   }
-  return (ERROR_NONE);
+  return (ERR_NONE);
 }
 
  /**
@@ -62,32 +62,32 @@ error_t sh_process_line(char **i_line, t_sh_env **env)
  */
 error_t sh_tokenize_input (t_sh_token **tokens, char *input_line, t_sh_env **environment)
 {
-  t_error syntax_status;
+  error_t syntax_status;
   char *error_token;
   // initial syntax check(quote and structure)
-  syntax_status = (!!sh_check_quote_error(input_line, NULL, QUOTE_NEUTRAL) << 1);
+  syntax_status = (!!sh_detect_quotes(input_line, NULL, QUOTE_NONE) << 1);
   // create tokens from input
-  *tokens = sh_create_tokens(input_line, QUOTE_NEUTRAL);
+  *tokens = sh_tokenize_input(input_line, QUOTE_NONE);
   // verify token structure
   syntax_status |= sh_validate_tokens(*tokens, &error_token);
   // handle syntax errors
   if (syntax_status & 0b11)
   {
     if (syntax_status & 0b10)
-      sh_display_error(ERROR_SYNTAX_QUOTE, ": unexpected end of file");
+      sh_display_error(ERR_BAD_QUOTE, ": unexpected end of file");
     else
-      sh_display_error(ERROR_SYNTAX_TOKEN, error_token);
+      sh_display_error(ERR_SYNTAX, error_token);
     sh_cleanup_token_list(*tokens);
     free(input_line);
     g_shell_exit_status = 2;
-    return (ERROR_PROCESSING_FAILED);
+    return (ERR_FAIL_GENERAL);
   }
   // process tokens(expand home, remove braces)
-  sh_format_tokens(tokens, sh_find_env(*environment, "HOME"));
-  sh_remove_token_braces(tokens);
+  sh_expand_tilde(tokens, sh_find_env(*environment, "HOME"));
+  sh_rmv_inv_parentheses(tokens);
   // additional validation
   if (!*tokens)
-    return (ERROR_PROCESSING_FAILED);
+    return (ERR_FAIL_GENERAL);
   free(input_line);
   if (syntax_status & 0b100)
     sh_handle_heredoc_limit(*tokens, environment);
@@ -118,13 +118,13 @@ error_t sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree,
   sh_set_current_tree(*execution_tree);
   // process heredoc
   if (sh_process_herecod(*execution_tree))
-    return (ERROR_HEREDOC_STOP);
+    return (ERR_HEREDOC_ABORTED);
   // initialize executors
   executor = sh_exec_init();
   // tmp ignore signals during execution
-  sh_signal_set_state(SIGANL_IGNORE);
+  sh_configure_signal_state(HANDLER_IGN);
   // execute command multiplexer
-  sh_execute_command_multiplex(*execution_tree, base_fd, executor, EXECUTION_WAIT);
+  sh_execute_command_multiplex(*execution_tree, base_fd, executor, EXEC_WAIT);
   // wait for and process child processes
   while (executor->pids)
   {
@@ -135,9 +135,9 @@ error_t sh_execute_command_tree(t_sh_token **tokens, t_sh_node **execution_tree,
     free(waiting_process);
   }
   // restor signal handling
-  sh_signal_set_state(SIGNAL_INTERACTIVE);
+  sh_configure_signal_state(HANDLER_INTERRUPT);
   free(executor);
-  return (ERROR_NONE);
+  return (ERR_NONE);
 }
 /**
  * @brief Manages heredoc processing for execution tree
@@ -154,13 +154,13 @@ error_t   sh_process_heredoc(t_sh_node *execution_tree)
   int heredoc_completed;
 
   heredoc_completed = 0;
-  if(sh_traverse_heredocs(execution_tree, &heredoc_completed) == ERROR_HEREDOC_STOP)
+  if(sh_traverse_heredocs(execution_tree, &heredoc_completed) == ERR_HEREDOC_ABORTED)
   {
     sh_tree_fd_cleanup(execution_tree);
     sh_destroy_tree(execution_tree);
-    return(ERROR_PROCESSING_FAILED);
+    return(ERR_FAIL_GENERAL);
   }
-  return (ERROR_NONE);
+  return (ERR_NONE);
 }
 
 /**

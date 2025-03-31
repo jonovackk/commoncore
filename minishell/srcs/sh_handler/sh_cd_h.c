@@ -39,19 +39,19 @@ error_t sh_change_directory(const char *target)
 {
     // Check if the target directory is NULL or empty
     if (!target)
-        return (ERR_FAIL);
+        return (ERR_FAIL_GENERAL);
 
     // Attempt to change the directory
     if (chdir(target) == -1)
     {
         // If the error is related to permission (EACCES), print the "No Permission" message
         if (errno == EACCES)
-            print_error_message(ERR_NOPERM, target);
+            sh_display_error(ERR_NO_PERMISS, target);
         // Otherwise, print "No such file or directory" message
         else
-            print_error_message(ERR_NOENT, target);
+            sh_display_error(ERR_NO_ENTRY, target);
         
-        return (ERR_FAIL); // Return failure if the directory change fails
+        return (ERR_FAIL_GENERAL); // Return failure if the directory change fails
     }
 
     return (ERR_NONE); // Return success if the directory change is successful
@@ -98,7 +98,7 @@ error_t sh_cd_target(int argc, char **argv, t_sh_env **vars, int out)
             }
             else
                 // Print an error if OLDPWD is not set
-                print_error_message(ERR_UNSET, "OLDPWD");
+                sh_display_error(ERR_VAR_UNSET, "OLDPWD");
         }
         // If it's any other directory, use the argument as the target
         else
@@ -106,7 +106,7 @@ error_t sh_cd_target(int argc, char **argv, t_sh_env **vars, int out)
     }
 
     // Attempt to change to the determined target directory
-    return (change_directory(target));
+    return (sh_change_directory(target));
 }
 
 
@@ -131,31 +131,31 @@ int sh_execute_cd(t_sh_cmd *cmd)
 
     // Check if there are too many arguments for the 'cd' command
     if (argc > 2)
-        print_error_message(ERR_ARGS, "cd");
+        sh_display_error(ERR_TOO_MANY_ARGS, "cd");
 
     // Load the environment variables related to directories (HOME, OLDPWD, PWD)
-    load_directory_env(*(cmd->environment), vars);
+    sh_dir_vars(*(cmd->environment), (t_sh_env **) &vars);
 
     // If no argument is given and HOME is unset, print an error
-    if ((argc - 1) == 0 && !vars[0])
-        print_error_message(ERR_UNSET, "HOME");
+    if ((argc - 1) && !vars[0])
+        sh_display_error(ERR_VAR_UNSET, "HOME");
 
     // Process the directory argument and change the directory
-    else if (process_cd_args(argc - 1, cmd->arguments + 1, vars, cmd->outfile))
-        return (ERR_FAIL);
+    else if (sh_cd_target(argc - 1, cmd->arguments + 1, vars, cmd->outfile))
+        return (ERR_FAIL_GENERAL);
 
     // Update OLDPWD (previous directory) environment variable if available
     if (vars[2])
         sh_update_env(cmd->environment, "OLDPWD", ft_strdup(vars[2]->values[0]));
     else
-        print_error_message(ERR_UNSET, "OLDPWD");
+        sh_display_error(ERR_VAR_UNSET, "OLDPWD");
 
     // Get the current working directory and update the PWD environment variable
-    newdir = sh_get_pwd();
+    newdir = sh_get_cwd();
     if (newdir)
         sh_update_env(cmd->environment, "PWD", newdir);
     else
-        print_error_message(ERR_UNSET, "PWD");
+        sh_display_error(ERR_VAR_UNSET, "PWD");
 
     return (ERR_NONE);
 }

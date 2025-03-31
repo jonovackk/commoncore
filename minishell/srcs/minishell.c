@@ -76,13 +76,13 @@ int main(int argc, char **argv, char **envp)
         ft_error(ERR_INVALID_OPTION, argv[1]);
         exit(EXIT_FAILURE);
     }
-    env = initialize_environment(argv, envp);
+    env = sh_env_init(argv, envp);
     display_logo(env);
-    setup_signal_handlers();
+    sh_configure_signal_state();
 
     while (1)
     {
-        update_environment(&env);
+        sh_env_context(&env);
         reset_command_tree();
         handle_prompt(&env);
     }

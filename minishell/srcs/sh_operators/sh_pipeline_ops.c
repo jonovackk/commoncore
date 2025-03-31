@@ -37,7 +37,7 @@ void sh_execute_command_multiplex(t_sh_node *node, int *node_fd,
   if(errno == EMFILE)
   {
     g_shell_exit_status = 1;
-    sh_error_display(ERR_FD_LIMIT, "pipe");
+    sh_display_error(ERR_FD_LIMIT, "pipe");
     return ;
   }
 }

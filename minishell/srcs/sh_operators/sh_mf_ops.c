@@ -30,13 +30,13 @@ error_t     sh_line_expand(t_sh_cmd *cmd, char **file)
     char    *var;
 
     var = ft_strdup(*file);
-    replace_env_vars(*cmd->environment, file, QUOTE_NONE);
-    if (verify_wildcar(*file, QUOTE_NONE))
-        expand_wildcars(file);
+    sh_replace_env_vars(*cmd->environment, file, QUOTE_NONE);
+    if (sh_contains_unquoted_wildcard(*file, QUOTE_NONE))
+        sh_replace_wildcards(file);
     files = ft_split(*file, ' ');
     if (array_len(files) > 1)
     {
-        print_error_message(ERR_AMBIGUOUS_REDIRECT, var);
+        sh_display_error(ERR_AMBIGUOUS_REDIRECT, var);
         free(var);
         free(*file);
         free_str_array((void **)files);
@@ -66,9 +66,9 @@ error_t     sh_heredoc_write(t_sh_cmd *cmd, char *file, int mode)
     if (*fd == -1)
     {
         if (errno == ENFILE)
-            print_error_message(ERR_FD_LIMIT, file);
+            sh_display_error(ERR_FD_LIMIT, file);
         else
-            print_error_message(ERR_NO_ENTRY, file);
+            sh_display_error(ERR_NO_ENTRY, file);
         free(file);
         return (ERR_FD_LIMIT);
     }

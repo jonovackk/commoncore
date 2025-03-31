@@ -87,7 +87,7 @@ char **sh_create_env_array(t_sh_env *env, int format)
 
     // Calculate the size of the environment list
     i = -1;
-    size = var_list_size(env) + 1;
+    size = sh_env_list_size(env) + 1;
 
     // Allocate memory for the array of strings
     env_array = malloc(size * sizeof(char *));
@@ -98,7 +98,7 @@ char **sh_create_env_array(t_sh_env *env, int format)
     while (++i < size - 1)
     {
         // Get the formatted string for each environment variable
-        env_array[i] = get_env_string(env, format, 1);
+        env_array[i] = sh_format_env_var(env, format, 1);
         if (!env_array[i])
         {
             // If an error occurs, free the allocated memory and return NULL
@@ -135,7 +135,7 @@ int sh_execute_env(t_sh_cmd *cmd)
     // If there are more than one argument, print an error message and return an error code
     if (array_len(cmd->arguments) > 1)
     {
-        print_error_message(ERR_ARGS, "env");
+        sh_display_error(ERR_TOO_MANY_ARGS, "env");
         return (127);  // Return error code for invalid arguments
     }
 
@@ -143,9 +143,9 @@ int sh_execute_env(t_sh_cmd *cmd)
     env = *(cmd->environment);
 
     // Retrieve the environment variables as an array of strings
-    env_array = get_env_string(env, 0);
+    env_array = sh_create_env_array(env, 0);
     if (!env_array)
-        return (ERR_FAIL);  // Return error if the environment array couldn't be retrieved
+        return (ERR_FAIL_GENERAL);  // Return error if the environment array couldn't be retrieved
 
     // Iterate through the environment array and print each variable that includes '=' (key-value pair)
     tmp = env_array;

@@ -11,7 +11,7 @@
 void sh_handle_heredoc_limit(t_sh_token *tokens, t_sh_env **environment)
 {
   // display heredoc limit error
-  sh_error_display(ERR_HEREDOC_LIMIT, NULL);
+  sh_display_error(ERR_HEREDOC_LIMIT, NULL);
   // cleanup resources
   sh_cleanup_token_list(tokens);
   sh_destroy_env_list(*environment);
@@ -35,7 +35,7 @@ void sh_parse_heredoc_line(char **line, int fd, int expand)
   first_line = 0;
   // expand vars if needed
   if (expand)
-    sh_expand_variables(sh_get_current_environment(), line, QUOTE_IGNORE);
+  sh_replace_env_vars(sh_env_context(), line, QUOTE_IGNORE);
   // write line to file
   write (fd, *line, ft_strlen(*line));
   // add nl for subsequent lines
@@ -71,7 +71,7 @@ int sh_process_heredoc_line(char *delimiter, char *temp_file, int fd)
   // determine if var expansion is needed
   should_expand = !(ft_strchr(delimiter, '"') || ft_strchr(delimiter, '\''));
   // remove quotes from frlimiter
-  sh_remove_quotes(&delimiter, QUOTE_NONE);
+  sh_rmv_quotes(&delimiter, QUOTE_NONE);
   // store tmp file and delimiter for signal handling
   sh_set_heredoc_holder(temp_file, 0);
   sh_set_heredoc_holder(delimiter, 1);
@@ -113,9 +113,9 @@ int sh_handle_heredoc_exit(char *delimiter, char *temp_file, int exit_status)
   if (exit_status == 1)
   {
     // rmv quote from delimiter
-    sh_remove_quotes(&delimiter, QUOTE_NONE);
+    sh_rmv_quotes(&delimiter, QUOTE_NONE);
     //display heredoc stop error
-    sh_error_display(ERR_HEREDOC_ABORTED, delimiter);
+    sh_display_error(ERR_HEREDOC_ABORTED, delimiter);
   }
   else if (exit_status == 130)
   {
@@ -168,7 +168,7 @@ int sh_create_heredoc(char *delimiter, char *temp_file)
         // process heredoc
         error_code = sh_process_heredoc_line(delimiter, temp_file, fd);
         // final cleanup
-        sh_destroy_env_list(sh_update_environment(NULL));
+        sh_destroy_env_list(sh_env_context(NULL));
         sh_close_multiple_fd(4, fd, 
                               STDIN_FILENO, 
                               STDOUT_FILENO, 

@@ -8,15 +8,15 @@ char    **sh_tokenize_quoted(char *s, char *sep)
     char    *segment;
 
     result = NULL;
-    state = QT_NONE;
+    state = QUOTE_NONE;
     if (!s || !sep || !*s)
         return (str_array_create(ft_strdup("")));
     ptr = s;
     while (*s && *ptr)
     {
         ptr = s;
-        while (*ptr && (!ft_strchr(sep, *ptr) || state != QT_NONE))
-            update_quote_status(*(ptr++), &state);
+        while (*ptr && (!ft_strchr(sep, *ptr) || state != QUOTE_NONE))
+            sh_update_quote_state(*(ptr++), &state);
         segment = ft_strndup(s, ptr - s);
         str_append(&result, segment);
         s = ptr;
@@ -38,7 +38,7 @@ void    sh_refresh_args(t_sh_cmd *cmd)
     {
         if (ft_strchr(*tmp, '$'))
         {
-            replace_env_vars(*cmd->environment, tmp, QUOTE_NONE);
+            sh_replace_env_vars(*cmd->environment, tmp, QUOTE_NONE);
             if (**tmp)
             {
                 raw = ft_split(*tmp, ' ');
@@ -48,7 +48,7 @@ void    sh_refresh_args(t_sh_cmd *cmd)
             continue;
         }
         if (ft_strncmp(*cmd->arguments, "export", 7))
-            remove_quotes(tmp, QT_NONE);
+        sh_rmv_quotes(tmp, QUOTE_NONE);
         str_append(&new_args, ft_strdup(*(tmp++)));
     }
     free_str_array((void **)cmd->arguments);
@@ -71,26 +71,26 @@ error_t     sh_prepare_cmd(t_sh_cmd *cmd)
     tmp = cmd->arguments;
     while (tmp && *tmp)
     {
-        if (verify_wildcard(*tmp, QUOTE_NONE))
-            expand_wildcards(tmp++);
+        if (sh_contains_unquoted_wildcard(*tmp, QUOTE_NONE))
+            sh_replace_wildcards(tmp++);
         else
-            remove_quotes(tmp++, QUOTE_NONE);
+        sh_rmv_quotes(tmp++, QUOTE_NONE);
     }
     sh_refresh_executable(cmd);
     if (!cmd->executable && !cmd->redirects)
-        return (ERR_NOCMD);
+        return (ERR_NO_COMMAND);
     return (ERR_NONE);
 }
 
 error_t     sh_traverse_heredocs(t_sh_node *nd, int *nd, int *hd)
 {
-    t_error     err;
+    error_t     err;
 
     if (!nd)
-        return (ERR_GEN);
+        return (ERR_NO_COMMAND);
     err = (ERR_NONE);
     if (*hd)
-        return (ERR_HSTOP);
+        return (ERR_HEREDOC_ABORTED);
     if (!nd->command)
     {
         err |= sh_traverse_heredocs(nd->left, hd);

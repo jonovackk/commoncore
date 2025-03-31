@@ -50,9 +50,9 @@ int     sh_display_expor_var(t_sh_cmd *cmd)
     char        *line;
 
     // Retrieve the environment variables as strings
-    env_array = get_env_strings(*(cmd->environment), 1);
+    env_array = sh_create_env_array(*(cmd->environment), 1);
     if (!env_array)
-        return (ERR_FAIL); // Return failure if unable to get the environment variables
+        return (ERR_FAIL_GENERAL); // Return failure if unable to get the environment variables
 
     // Sort the environment variables alphabetically
     sort_str_array(env_array, array_len(env_array));
@@ -143,7 +143,7 @@ int     sh_update_env_var(t_sh_cmd *cmd, char *tmp)
  * @param cmd The command structure containing the arguments and environment.
  * @return ERR_NONE if the export operation is successful, ERR_FAIL if an error occurs.
  */
-int     sh_export_builtin(t_sh_cmd *cmd)
+int    sh_execute_export(t_sh_cmd *cmd)
 {
     char        *tmp;
     error_t     errcode;
@@ -152,28 +152,28 @@ int     sh_export_builtin(t_sh_cmd *cmd)
     errcode = ERR_NONE;
 
     // If there's only one argument and it's to show the list, display the export list
-    if (array_len(tmp) == 1 && show_export_list(cmd)) // possivel erro verificar
-        errcode = ERR_FAIL;
+    if (array_len(tmp) == 1 && sh_display_expor_var(cmd)) // possivel erro verificar
+        errcode = ERR_FAIL_GENERAL;
     else
     {
         // Process each argument and attempt to export them
         while (*(++tmp))
         {
             // Validate the syntax of the export variable
-            if (!export_syntax_valid(*tmp))
+            if (!sh_export_syntax(*tmp))
             {
                 // Print error message if the syntax is invalid
-                print_error_message(ERR_INV, *tmp);
-                errcode = ERR_FAIL;
+                sh_display_error(ERR_INVALID, *tmp);
+                errcode = ERR_FAIL_GENERAL;
             }
             // Export or update the variable in the environment
-            if (export_var(cmd, *tmp))
-                errcode = ERR_FAIL;
+            if (sh_update_env_var(cmd, *tmp))
+                errcode = ERR_FAIL_GENERAL;
         }
     }
 
     // Update the environment context
-    update_env_context(cmd->environment);
+    sh_env_context(cmd->environment);
 
     // Return the error code, either success or failure
     return (errcode);

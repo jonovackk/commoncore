@@ -1,3 +1,5 @@
+#include "../../includes/minishell.h"
+
 /**
  * @brief Updates the quote status based on the given character.
  * 
@@ -16,15 +18,15 @@ int sh_update_quote_state(char c, t_qstate *qstatus)
 
     previous = *qstatus; // Store the previous state
 
-    if (*qstatus == QT_NONE)
+    if (*qstatus == QUOTE_NONE)
     {
         if (c == '\'')
-            *qstatus = QT_SINGLE; // Enter single-quote mode
+            *qstatus = QUOTE_SINGLE; // Enter single-quote mode
         if (c == '"')
-            *qstatus = QT_DOUBLE; // Enter double-quote mode
+            *qstatus = QUOTE_DOUBLE; // Enter double-quote mode
     }
-    else if ((c == '\'' && *qstatus == QT_SINGLE) || (c == '"' && *qstatus == QT_DOUBLE))
-        *qstatus = QT_NONE; // Exit quotes if closing match is found
+    else if ((c == '\'' && *qstatus == QUOTE_SINGLE) || (c == '"' && *qstatus == QT_DOUBLE))
+        *qstatus = QUOTE_NONE; // Exit quotes if closing match is found
 
     return (*qstatus != previous); // Return whether the state changed
 }
@@ -45,13 +47,13 @@ int sh_ignoring_quotes(char *str)
     t_qstate qstatus;
     int length;
 
-    qstatus = QT_NONE; // Start with no active quotes
+    qstatus = QUOTE_NONE; // Start with no active quotes
     length = 0;
 
     while (*str)
     {
         // Update quote state; if unchanged, count the character
-        if (!update_quote_status(*(str++), &qstatus))
+        if (!sh_update_quote_state(*(str++), &qstatus))
             length++;
     }
     return (length);
@@ -75,7 +77,7 @@ void sh_rmv_inv_parentheses(t_sh_token **tokens)
     while (current)
     {
         // If the current token has invalid parentheses, remove it
-        if (!check_valid_logical_parenthesis(current))
+        if (!sh_check_ops_in_brackets(current))
         {
             delet_token(&current); // Delete invalid token
 

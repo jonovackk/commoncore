@@ -76,14 +76,14 @@ char **sh_get_matching_files(char *pattern)
     DIR *dir_stream;
     struct dirent *entry;
 
-    cwd = ft_get_pwd();  // Get current working directory
+    cwd = sh_get_cwd();  // Get current working directory
     if (!cwd)
         return (NULL); // Possible error: `ft_get_pwd()` might return NULL
 
     dir_stream = opendir(cwd);  // Open directory stream
     if (!dir_stream)
     {
-        ft_error_message(ERR_NOENT, cwd); // Print error if directory cannot be opened
+        sh_display_error(ERR_NO_ENTRY, cwd); // Print error if directory cannot be opened
         free(cwd);
         return (NULL);
     }
@@ -94,7 +94,7 @@ char **sh_get_matching_files(char *pattern)
     while (entry)
     {
         // Ignore hidden files (starting with '.') and match against the wildcard pattern
-        if (entry->d_name[0] != '.' && match_wildcard(entry->d_name, pattern))
+        if (entry->d_name[0] != '.' && sh_match_wildcard(entry->d_name, pattern))
             ft_strapp(&file_list, ft_strdup(entry->d_name));
 
         entry = readdir(dir_stream);
@@ -122,7 +122,7 @@ void sh_expd_wildcard_token(t_sh_token **token_list, t_sh_token **current)
     t_sh_token *prev_token;
 
     next_token = (*current)->next;  // Store reference to next token
-    wc_tokens = ft_tokenizer((*current)->content, QT_NONE); // Tokenize wildcard content
+    wc_tokens = sh_tokenize_input((*current)->content, QUOTE_NONE); // Tokenize wildcard content
     ft_add_token(&wc_tokens, next_token); // Append new tokens to the list
 
     prev_token = (*current)->prev; // Store reference to previous token
@@ -185,14 +185,14 @@ void sh_replace_wildcards(char **str)
     if (!unquoted_str)
         return;
 
-    remove_quotes(&unquoted_str, QT_NONE); // Remove any surrounding quotes
-    matched_files = get_matching_files(unquoted_str); // Get files matching the pattern
+    sh_rmv_quotes(&unquoted_str, QUOTE_NONE); // Remove any surrounding quotes
+    matched_files = sh_get_matching_files(unquoted_str); // Get files matching the pattern
     free(unquoted_str);
 
     if (matched_files && *matched_files) // Ensure there are matches before modifying input
     {
         free(*str);
-        formatted_output = format_wildcard_matches(&matched_files); // Format matches into a single string
+        formatted_output = sh_format_wildcard_matches(&matched_files); // Format matches into a single string
         *str = ft_strdup(formatted_output);
         free(formatted_output);
     }

@@ -60,17 +60,17 @@ void sh_handle_exit(int exit_code, error_t ec, t_sh_cmd *cmd)
     char    *msg;
 
     // Handle non-numeric argument error (ERR_NAN)
-    if (ec == ERR_NAN)
+    if (ec == ERR_NOT_A_NUMBER)
     {
         msg = ft_strjoin("exit: ", cmd->arguments[1], NULL, 0b00);
-        print_error_message(ERR_NAN, msg);
+        sh_display_error(ERR_NOT_A_NUMBER, msg);
         free(msg);
     }
 
     // Handle invalid arguments for the `exit` command (ERR_ARGS)
-    if (ec == ERR_ARGS)
+    if (ec == ERR_TOO_MANY_ARGS)
     {
-        print_error_message(ERR_ARGS, "exit");
+        sh_display_error(ERR_TOO_MANY_ARGS, "exit");
         return;
     }
 
@@ -100,7 +100,7 @@ void sh_handle_exit(int exit_code, error_t ec, t_sh_cmd *cmd)
  * @param cmd The command structure containing the arguments passed to the `exit` command.
  * @return 1 if there were too many arguments, otherwise it exits the program.
  */
-int sh_exit_builtin(t_sh_cmd *cmd)
+int t_execute_exit(t_sh_cmd *cmd)
 {
     int argc;
 
@@ -118,14 +118,14 @@ int sh_exit_builtin(t_sh_cmd *cmd)
 
     // If the argument is non-numeric, print an error and exit
     if (!is_numeric(cmd->arguments[1]))
-        sh_handle_exit(ERR_GEN, ERR_NAN, cmd);
+        sh_handle_exit(ERR_FAIL_UNKNOWN, ERR_NOT_A_NUMBER, cmd);
 
     // If there are too many arguments, print an error and exit
     if (argc > 1)
-        sh_handle_exit(ERR_FAIL, ERR_ARGS, cmd);
+        sh_handle_exit(ERR_FAIL_GENERAL, ERR_TOO_MANY_ARGS, cmd);
 
     // If there's a valid numeric argument, convert and exit with the appropriate code
-    sh_handle_exit(exit_atoi(cmd->arguments[1]), ERR_NONE, cmd);
+    sh_handle_exit(sh_exit_status_atoi(cmd->arguments[1]), ERR_NONE, cmd);
 
     // Return 1 if there were too many arguments (though this is never reached because exit is called)
     return (argc > 1);

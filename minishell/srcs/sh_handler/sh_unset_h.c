@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../../includes/minishell.h"
 
 /**
  * @brief Removes environment variables specified in command arguments
@@ -9,7 +9,7 @@
  * @param cmd Command containing arguments to unset
  * @return Error status (typically no error)
  */
-int sh_unset_variables(t_sh_cmd *cmd)
+int sh_execute_unset(t_sh_cmd *cmd)
 {
     char **current_arg;
     // start from second argument (first is 'unset' command)
