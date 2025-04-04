@@ -36,7 +36,7 @@ long sh_exit_status_atoi(char *str);
 
 void sh_handle_exit(int exit_code, error_t ec, t_sh_cmd *cmd);
 
-int sh_execute_exit(t_sh_cmd *cmd);
+int sh_exit_builtin(t_sh_cmd *cmd);
 
 /* sh_export_h.c */
 
@@ -46,7 +46,7 @@ int     sh_display_expor_var(t_sh_cmd *cmd);
 
 int     sh_update_env_var(t_sh_cmd *cmd, char *tmp);
 
-int     sh_execute_export(t_sh_cmd *cmd);
+int     sh_export_builtin(t_sh_cmd *cmd);
 
 /* sh_pwd_h.c */
 
@@ -60,7 +60,7 @@ char    *sh_get_prompt(t_sh_env *envp);
 
 /* sh_unset_h.c */
 
-int sh_execute_unset(t_sh_cmd *cmd);
+int sh_unset_variables(t_sh_cmd *cmd);
 
 
 

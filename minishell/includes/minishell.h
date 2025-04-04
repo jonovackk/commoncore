@@ -43,78 +43,49 @@
 
 
 
-/*PROMPTS ******************************************** */
+/* Prefixos de Mensagens */
+#define PROMPT_SUCCESS "\001\033[32;1m\002$?\001\033[0m\002 "
+#define PROMPT_FAIL "\001\033[31;1m\002$?\001\033[0m\002 "
+#define PROMPT_TAIL "\001\033[37;1m\002Minishell$\001\033[0m\002 "
+#define PROMPT_SINGLE_DQUOTE "\001\033[36;1m\002'' dquote:\001\033[0m\002 > "
+#define PROMPT_DOUBLE_DQUOTE "\001\033[34;1m\002\"\" dquote:\001\033[0m\002 > "
+#define PROMPT_HEREDOC "\001\033[35;1m\002HD here-doc:\001\033[0m\002 > "
+#define PROMPT_ERROR "\001\033[31;1m\002/!\\ ERROR! > "
+#define PROMPT_WARNING "\001\033[33;1m\002/!\\ WARNING! > "
 
-# define RD_APPENDS "\001\033[32;1m\002$?\001\033[0m\002 "
+/* Mensagens de Erro */
+#define ERR_MSG_VAR_NOT_SET "%scd: %s not set\n"
+#define ERR_MSG_NO_SUCH_FILE_OR_DIR "%s%s: no such file or directory\n"
+#define ERR_MSG_TOO_MANY_ARGS "%s%s: too many arguments\n"
+#define ERR_MSG_NUMERIC_ARG_REQUIRED "%s%s: numeric argument required\n"
+#define ERR_MSG_INVALID_IDENTIFIER "%sexport: `%s': not a valid identifier\n"
+#define ERR_MSG_PERMISSION_DENIED "%s%s: Permission denied\n"
+#define ERR_MSG_IS_A_DIRECTORY "%s%s: Is a directory\n"
+#define ERR_MSG_INVALID_OPTION "%s%s: Invalid option\n"
+#define ERR_MSG_HEREDOC_EOF "%s here-document delimited by end-of-file (wanted `%s')\n"
+#define ERR_MSG_UNEXPECTED_EOF "%sunexpected EOF while looking for matching `%s'\n"
+#define ERR_MSG_SYNTAX_ERROR_QUOTE "%ssyntax error%s\n"
+#define ERR_MSG_SYNTAX_ERROR_TOKEN "%ssyntax error near unexpected token `%s'\n"
+#define ERR_MSG_SYNTAX_ERROR "%ssyntax error\n"
+#define ERR_MSG_HEREDOC_LIMIT_EXCEEDED "%smaximum here-document count exceeded\n"
+#define ERR_MSG_NO_MORE_FDS "%s%s: no more fds. Aborting\n"
+#define ERR_MSG_AMBIGUOUS_REDIRECT "%s%s: ambiguous redirect\n"
 
-# define RD_INFILES "\001\033[31;1m\002$?\001\033[0m\002 "
+/* Modos de Abertura de Arquivos */
+#ifndef FILE_MODE_READ
+#define FILE_MODE_READ 00 /* O_RDONLY */
+#endif
 
-# define RD_OUTPUTS "\001\033[37;1m\002 Minishell$\001\033[0m\002 "
+#ifndef FILE_MODE_WRITE_CREATE
+#define FILE_MODE_WRITE_CREATE 01101 /* O_WRONLY | O_CREAT | O_TRUNC */
+#endif
 
-# define QU_ZERO "\001\033[36;1m\002''  dquote:\001\033[0m\002 > "
+#ifndef FILE_MODE_WRITE_APPEND
+#define FILE_MODE_WRITE_APPEND 02101 /* O_WRONLY | O_CREAT | O_APPEND */
+#endif
 
-# define P_DDQUOTE "\001\033[34;1m\002\"\"  dquote:\001\033[0m\002 > "
+#ifndef FILE_MODE_WRITE_EXCLUSIVE
+#define FILE_MODE_WRITE_EXCLUSIVE 01301 /* O_WRONLY | O_EXCL | O_CREAT | O_TRUNC */
+#endif
 
-# define RD_HEREDOC "\001\033[35;1m\002HD  here-doc:\001\033[0m\002 > "
-
-# define P_ERROR "\001\033[31;1m\002/!\\ ERROR! > "
-
-# define P_WARNING "\001\033[33;1m\002/!\\ WARNING! > "
-
-
-/* ********************************************** */
-
-# define ES_NOTSET "%scd: %s not set\n"
-
-# define ES_NOFORD "%s%s no such file or directory\n"
-
-# define ES_TMARGS "%s%s: too many arguments\n"
-
-# define ES_NOTNUM "%s%s: numeric argument required\n"
-
-# define ES_NOTVAL "%sexport: `%s': not a valid identifier\n"
-
-# define ES_NOPERM "%s%s: Permission denied\n"
-
-# define ES_ISADIR "%s%s: Is a directory\n"
-
-# define ES_INVOPT "%s%s: Invalid option\n"
-
-# define ES_HDSTOP "%s here-document delimited by end-of-file, (wanted `%s')\n"
-
-# define ES_DQSTOP "%sunexpected EOF while looking for matching `%s\'\n"
-
-# define ES_SYNTXQ "%ssyntax error%s\n"
-
-# define ES_SYNTXT "%ssyntax error near unexcepted token `%s'\n"
-
-# define ES_SYNTXL "%ssyntax error\n"
-
-# define ES_HLIMIT "%smaximum here-document count exceeded\n"
-
-# define ES_INVFDS "%s%s: no more fds. Aborting\n"
-
-# define ES_AMBRED "%s%s: ambiguous redirect\n"
-
-/* OPENING MODES ************************************************************ */
-
-// O_RDONLY = 00
-# ifndef OPEN_READ
-#  define OPEN_READ 00
-# endif
-
-// O_WRONLY = 01 | O_CREAT = 0100 | O_TRUNC = 01000
-# ifndef OPEN_CREATE
-#  define OPEN_CREATE 01101
-# endif
-
-// O_WRONLY = 01 | O_CREAT = 0100 | O_APPEND = 02000
-# ifndef OPEN_APPEND
-#  define OPEN_APPEND 02101
-# endif
-
-// O_WRONLY = 01 | O_EXCL = 0200 | O_CREAT = 0100 | O_TRUNC = 01000
-# ifndef OPEN_EXCL
-#  define OPEN_EXCL 01301
-
-# endif
+#endif
