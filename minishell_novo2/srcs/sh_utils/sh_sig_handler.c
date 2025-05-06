@@ -86,14 +86,14 @@ void sh_signal_heredoc_mode (int signal)
     {
       printf("^C\n");
       // rmv tmp herecod file
-      unlink(sh_get_heredoc_holder(NULL, 0));
+      unlink(sh_heredoc_state(NULL, 0));
       // cleanup environment
       sh_destroy_env_list(sh_env_context(NULL));
       // free heredoc related resources
-      free(sh_get_heredoc_holder(NULL, 0));
-      free(sh_get_heredoc_holder(NULL, 1));
+      free(sh_heredoc_state(NULL, 0));
+      free(sh_heredoc_state(NULL, 1));
       // close fd
-      fd = *(int *)sh_get_quote_holder(NULL, 2);
+      fd = *(int *)sh_heredoc_state(NULL, 2);
       sh_close_multiple_fd(4, fd,
         STDIN_FILENO,
           STDOUT_FILENO,

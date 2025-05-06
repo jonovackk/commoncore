@@ -33,7 +33,7 @@ char    *sh_trim_pwd(char *str)
  * 
  * @return A newly allocated string containing the current working directory, or `NULL` if it fails.
  */
-char    *sh_get_cwd(void)
+char    *sh_get_pwd(void)
 {
     char    cwd[65536];
 

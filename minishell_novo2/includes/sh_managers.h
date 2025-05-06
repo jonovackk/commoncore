@@ -1,6 +1,9 @@
 #ifndef SH_MANAGERS_H
 # define SH_MANAGERS_H
 
+# define LEFT 0
+# define RIGHT 1
+
 # include <unistd.h>  /* For pid_t */
 # include "sh_enumerates.h"
 

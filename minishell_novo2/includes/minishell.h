@@ -8,12 +8,14 @@
 # include <unistd.h>
 # include <signal.h>
 # include <fcntl.h>
+# include <termios.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <errno.h>
+# include <dirent.h>
 
 /* External library includes */
 # include "../libft/includes/libft.h"

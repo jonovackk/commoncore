@@ -43,7 +43,7 @@ void sh_env_defaults(t_sh_env **env, char **argv)
 
     // Set _ to the executable path (argv[0])
     // FIXED ERROR: Removed stray 'm' in str_join
-    tmp = str_join(sh_get_pwd(), argv[0], "/", 0b01);
+    tmp = ft_strjoin(sh_get_pwd(), argv[0], "/", 0b01);
     if (tmp)
         sh_update_env(env, "_", tmp); // Possible error: Ensure the result of str_join is valid.
 }
@@ -98,7 +98,7 @@ t_sh_env *sh_env_init(char **argv, char **envp)
     // Set LOGOPWD variable to include "/logo" in PWD path
     if (sh_find_env(env, "PWD") && sh_find_env(env, "PWD")->values)
     {
-        tmp = str_join(sh_find_env(env, "PWD")->values[0], "/logo", 0b00);
+        tmp = ft_strjoin(sh_find_env(env, "PWD")->values[0], "logo", "/", 0b00);
         if (tmp)
             sh_update_env(&env, "LOGOPWD", tmp); // Possible error: ensure str_join didn't return NULL.
     }

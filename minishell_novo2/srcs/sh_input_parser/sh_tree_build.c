@@ -16,7 +16,7 @@
 t_sh_node *sh_cmd_token(t_sh_token **tokens, t_sh_env **env, t_sh_token *tmp)
 {
     char **args;
-    redir_t *redirs;
+    t_sh_redir *redirs;
 
     args = NULL;
     redirs = NULL;
@@ -24,15 +24,15 @@ t_sh_node *sh_cmd_token(t_sh_token **tokens, t_sh_env **env, t_sh_token *tmp)
     {
         if (tmp->type & TOKEN_REDIRECT)
         {
-            sh_add_redir(&redirs, sh_init_redir(tmp));
+            sh_add_redir(&redirs, sh_new_redir(tmp));
             tmp = tmp->next;
         }
         else if (tmp->type & TOKEN_TEXT)
-            sh_strapp(&args, ft_strdup(tmp->str));
+            ft_strapp(&args, ft_strdup(tmp->content));
         tmp = tmp->next;
     }
     *tokens = tmp;
-    return (sh_init_sh_node(sh_init_command(redirs, args, env), NULL));
+    return (sh_create_exec_node(sh_create_cmd(redirs, args, env), NULL));
 }
 
 /**
@@ -57,14 +57,14 @@ void sh_brace_tree(t_sh_token **tk, t_sh_node **tree, t_sh_env **env)
     if (!(*tree))
         *tree = subtree;
     else
-        sh_insert_child(tree, subtree, RIGHT);
+        sh_set_child_node(tree, subtree, RIGHT);
     (*tk) = (*tk)->next;
     while ((*tk) && (!((*tk)->type & TOKEN_PARENTHESIS && \
-            !ft_strncmp((*tk)->str, ")", 2)) || level))
+            !ft_strncmp((*tk)->content, ")", 2)) || level))
     {
-        if ((*tk)->type & TOKEN_PARENTHESIS && !ft_strncmp((*tk)->str, "(", 2))
+        if ((*tk)->type & TOKEN_PARENTHESIS && !ft_strncmp((*tk)->content, "(", 2))
             level++;
-        if ((*tk)->type & TOKEN_PARENTHESIS && !ft_strncmp((*tk)->str, ")", 2))
+        if ((*tk)->type & TOKEN_PARENTHESIS && !ft_strncmp((*tk)->content, ")", 2))
             level--;
         (*tk) = (*tk)->next;
     }
@@ -90,11 +90,11 @@ void sh_connect_ops(t_sh_token **tk, t_sh_node **tree, t_sh_env **env)
     if ((*tk)->type & TOKEN_LOGICAL)
     {
         next = sh_build_tree((*tk)->next, env);
-        sh_associate(tree, next, NULL, sh_dup_token(*tk));
+        sh_connect_nodes(tree, next, NULL, sh_clone_token(*tk));
     }
-    else if ((*tk)->type & TK_PIPE)
+    else if ((*tk)->type & TOKEN_PIPE)
     {
-        sh_insert_parent(tree, sh_init_sh_node(NULL, sh_dup_token(*tk)), LEFT);
+        sh_set_parent_node(tree, sh_create_exec_node(NULL, sh_clone_token(*tk)), LEFT);
         (*tk) = (*tk)->next;
     }
 }
@@ -117,18 +117,18 @@ t_sh_node *sh_build_tree(t_sh_token *tokens, t_sh_env **env)
     t_token_kind        tmp;
 
     tree = NULL;
-    sh_update_env(env);
+    sh_env_context(env);
     while (tokens)
     {
         if (tokens->type & TOKEN_PARENTHESIS)
         {
-            if (!ft_strncmp(tokens->str, "(", 2))
+            if (!ft_strncmp(tokens->content, "(", 2))
                 sh_brace_tree(&tokens, &tree, env);
             else
                 return (tree);
         }
         else if (tokens->type & (TOKEN_TEXT | TOKEN_REDIRECT))
-            sh_insert_child(&tree, sh_cmd_token(&tokens, env, tokens), RIGHT);
+            sh_set_child_node(&tree, sh_cmd_token(&tokens, env, tokens), RIGHT);
         if (!tokens)
             return (tree);
         tmp = tokens->type;

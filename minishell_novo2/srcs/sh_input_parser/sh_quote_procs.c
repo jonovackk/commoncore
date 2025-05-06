@@ -24,7 +24,7 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_quote_state state)
         return;
 
     orig = *line;
-    set_dq_holder(*line, 0); // Initialize quote tracking
+    sh_double_quote_state(*line, 0); // Initialize quote tracking
 
     // Traverse line and update quote state
     while (**line)
@@ -33,7 +33,7 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_quote_state state)
     // If an unclosed quote remains, retrieve additional input
     if (state)
     {
-        dq_buf = open_dq_file(tmp_fd, state);
+        dq_buf = sh_opendquote(tmp_fd, state);
         if (!dq_buf)
         {
             free(dq_buf);
@@ -42,9 +42,9 @@ void sh_handle_unclosed_quotes(char **line, int tmp_fd, t_quote_state state)
         }
 
         // Append new input to original line and enforce quotes again
-        dq_buf = join_str(orig, dq_buf, "\n", 0b11);
+        dq_buf = ft_strjoin(orig, dq_buf, "\n", 0b11);
         sh_handle_unclosed_quotes(&dq_buf, tmp_fd, QUOTE_NONE);
-        set_dq_holder(dq_buf, 0);
+        sh_double_quote_state(dq_buf, 0);
         *line = dq_buf;
         return;
     }

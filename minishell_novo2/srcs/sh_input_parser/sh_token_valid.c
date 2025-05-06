@@ -22,26 +22,26 @@ int sh_validate_subtoken(t_sh_token *token)
         return (0);
     
     // Ensure redirections are followed by a valid token
-    else if (token->type == TOKEN_REDIRECT && !(token->next->type & logical_mask))
+    else if (token->type == TOKEN_REDIRECT && !(token->next->type & TOKEN_TEXT))
         return (0);
     
     // Prevent pipes from being followed by logical operators
-    else if (token->type == TOKEN_PIPE && (token->next->type & logical_mask))
+    else if (token->type == TOKEN_PIPE && (token->next->type & binop_mask))
         return (0);
     
     // Ensure valid parenthesis usage
-    else if (!ft_strncmp(token->str, "(", 2) &&
-             ((token->next->type & logical_mask) || !ft_strncmp(token->next->str, ")", 2)))
+    else if (!ft_strncmp(token->content, "(", 2) &&
+             ((token->next->type & binop_mask) || !ft_strncmp(token->next->content, ")", 2)))
         return (0);
 
     // Prevent text tokens from being immediately followed by an opening parenthesis
     else if (token->type == TOKEN_TEXT && (token->next->type & TOKEN_PARENTHESIS) &&
-             !ft_strncmp(token->next->str, "(", 2))
+             !ft_strncmp(token->next->content, "(", 2))
         return (0);
 
     // Prevent closing parenthesis being followed by text or another opening parenthesis
-    else if (!ft_strncmp(token->str, ")", 2) &&
-             (token->next->type & text_mask || !ft_strncmp(token->next->str, "(", 2)))
+    else if (!ft_strncmp(token->content, ")", 2) &&
+             (token->next->type & str_mask || !ft_strncmp(token->next->content, "(", 2)))
         return (0);
     
     return (1);
@@ -66,7 +66,7 @@ int sh_validate_syntax(t_sh_token *token, char **err_token)
 
     while (token->next)
     {
-        *err_token = token->next->str;
+        *err_token = token->next->content;
         if (!sh_validate_subtoken(token))
             return (0);
         token = token->next;
@@ -90,9 +90,9 @@ int sh_check_parenthesis_balance(t_sh_token *tokens)
 
     while (tokens != NULL)
     {
-        if ((tokens->type & TOKEN_PARENTHESIS) && !ft_strncmp(tokens->str, "(", 2))
+        if ((tokens->type & TOKEN_PARENTHESIS) && !ft_strncmp(tokens->content, "(", 2))
             balance++;
-        else if ((tokens->type & TOKEN_PARENTHESIS) && !ft_strncmp(tokens->str, ")", 2))
+        else if ((tokens->type & TOKEN_PARENTHESIS) && !ft_strncmp(tokens->content, ")", 2))
             balance--;
 
         // If a closing parenthesis appears before an opening one, it's invalid
@@ -122,7 +122,7 @@ int sh_validate_tokens(t_sh_token *tokens, char **err_token)
     t_sh_token *current;
     int here_doc_count;
 
-    *err_token = tokens->str;
+    *err_token = tokens->content;
 
     // Ensure correct token sequence and balanced brackets
     if (!sh_validate_syntax(tokens, err_token) || !sh_check_parenthesis_balance(tokens))
@@ -134,7 +134,7 @@ int sh_validate_tokens(t_sh_token *tokens, char **err_token)
     // Count the number of here-document operators (<<)
     while (current)
     {
-        here_doc_count += ((current->type & TOKEN_REDIRECT) && !ft_strncmp(current->str, "<<", 3));
+        here_doc_count += ((current->type & TOKEN_REDIRECT) && !ft_strncmp(current->content, "<<", 3));
         current = current->next;
     }
 
@@ -163,18 +163,18 @@ int sh_check_ops_in_brackets(t_sh_token *token)
     valid = 0;
 
     // If the token isn't an opening parenthesis, return valid by default
-    if (!token || !(token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->str, "(", 2)))
+    if (!token || !(token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->content, "(", 2)))
         return (1);
 
     token = token->next;
 
     // Traverse tokens until the corresponding closing bracket is found
-    while (token && (!(token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->str, ")", 2)) || bracket_level))
+    while (token && (!(token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->content, ")", 2)) || bracket_level))
     {
-        if (token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->str, "(", 2))
+        if (token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->content, "(", 2))
             bracket_level++;
 
-        if (token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->str, ")", 2))
+        if (token->type & TOKEN_PARENTHESIS && !ft_strncmp(token->content, ")", 2))
             bracket_level--;
 
         // If a logical operator is found before closing, mark it as valid
@@ -190,7 +190,7 @@ int sh_check_ops_in_brackets(t_sh_token *token)
 
     // If the bracketed sequence is invalid, remove it
     if (!(token && valid))
-        ft_remove_token(&token);
+        sh_delete_token(&token);
 
     return (token && valid);
 }

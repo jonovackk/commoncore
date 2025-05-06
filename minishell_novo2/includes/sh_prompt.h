@@ -18,8 +18,9 @@ int     sh_get_dquote(char *line, t_sh_env **env, char *tmp);
 error_t sh_quote_handler(char **line, t_sh_env **env, int status);
 
 /* sh_state_pt.c */
-char    *sh_double_quote_state(char *addr, int type);
-char    *sh_heredoc_state(char *addr, int type);
-t_sh_node *sh_command_tree_state(int reset, t_sh_node *root);
+char        *sh_double_quote_state(char *addr, int type);
+char        *sh_heredoc_state(char *addr, int type);
+t_sh_node   *sh_command_tree_state(int reset, t_sh_node *root);
+char        *sh_opendquote(int tmp_fd, t_quote_state quote_state);
 
 #endif

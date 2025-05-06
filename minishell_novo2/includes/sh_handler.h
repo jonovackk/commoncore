@@ -33,7 +33,7 @@ int     sh_execute_export(t_sh_cmd *cmd);
 
 /* sh_pwd_h.c */
 char    *sh_trim_pwd(char *str);
-char    *sh_get_cwd(void);
+char    *sh_get_pwd(void);
 int     sh_execute_pwd(t_sh_cmd *cmd);
 char    *sh_get_prompt(t_sh_env *envp);
 

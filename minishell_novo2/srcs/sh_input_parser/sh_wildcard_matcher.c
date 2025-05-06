@@ -71,12 +71,12 @@ int sh_match_wildcard(const char *filename, const char *pattern)
  */
 char **sh_get_matching_files(char *pattern)
 {
-    char *cwd;
-    char **file_list;
-    DIR *dir_stream;
+    char    *cwd;
+    char    **file_list;
+    DIR     *dir_stream;
     struct dirent *entry;
 
-    cwd = sh_get_cwd();  // Get current working directory
+    cwd = sh_get_pwd();  // Get current working directory
     if (!cwd)
         return (NULL); // Possible error: `ft_get_pwd()` might return NULL
 
@@ -122,11 +122,11 @@ void sh_expd_wildcard_token(t_sh_token **token_list, t_sh_token **current)
     t_sh_token *prev_token;
 
     next_token = (*current)->next;  // Store reference to next token
-    wc_tokens = sh_tokenize_input((*current)->content, QUOTE_NONE); // Tokenize wildcard content
-    ft_add_token(&wc_tokens, next_token); // Append new tokens to the list
+    wc_tokens = sh_tokenizer_input((*current)->content, QUOTE_NONE);
+    sh_append_token(&wc_tokens, next_token); // Append new tokens to the list
 
     prev_token = (*current)->prev; // Store reference to previous token
-    ft_del_token(*current); // Remove original wildcard token
+    sh_token_free(*current); // Remove original wildcard token
 
     if (prev_token)
     {
@@ -161,8 +161,8 @@ char *sh_format_wildcard_matches(char ***file_array)
     char *formatted;
 
     formatted = NULL;
-    sort_str_array(*file_array, array_len(*file_array)); // Sort filenames alphabetically
-    return (join_str_array(*file_array, ft_strdup(" "), 0b10)); 
+    ft_sort_lowstrs_tab(*file_array, ft_tab_len(*file_array)); // Sort filenames alphabetically
+    return (ft_strsjoin(*file_array, ft_strdup(" "), 0b10)); 
 }
 
 /**
@@ -177,7 +177,7 @@ char *sh_format_wildcard_matches(char ***file_array)
  */
 void sh_replace_wildcards(char **str)
 {
-    char *matched_files;
+    char **matched_files;
     char *formatted_output;
     char *unquoted_str;
 
@@ -197,5 +197,5 @@ void sh_replace_wildcards(char **str)
         free(formatted_output);
     }
 
-    free_str_array((void **)matched_files); // Free allocated file list
+    ft_free_tab((void **)matched_files); // Free allocated file list
 }

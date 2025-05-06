@@ -6,7 +6,7 @@
 
 /* sh_input_tokenizer.c */
 int sh_is_shell_operator(char *input, t_quote_state qstat);
-t_token_kind sh_classify_token(char *input, t_quote_state qstat);
+t_token_kind sh_classify_token(char **input, t_quote_state qstat);
 t_sh_token *sh_tokenizer_input(char *input, t_quote_state qstat);
 int sh_contains_unquoted_wildcard(char *input, t_quote_state qstat);
 void sh_expand_tilde(t_sh_token **token_list, t_sh_env *home_var);

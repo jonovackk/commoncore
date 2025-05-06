@@ -44,25 +44,25 @@ int sh_is_shell_operator(char *input, t_quote_state qstat)
  * @param qstat The current quote state.
  * @return The corresponding token kind.
  */
-t_token_kind sh_classify_token(char *input, t_quote_state qstat)
+t_token_kind sh_classify_token(char **input, t_quote_state qstat)
 {
     if (qstat != QUOTE_NONE)
         return (TOKEN_TEXT); // If inside quotes, treat as plain text
 
     // Check for parentheses
-    if (!ft_strncmp(input, "(", 1) || !ft_strncmp(input, ")", 1))
+    if (!ft_strncmp(*input, "(", 1) || !ft_strncmp(*input, ")", 1))
         return (TOKEN_PARENTHESIS);
 
     // Check for logical operators (&&, ||)
-    if (!ft_strncmp(input, "||", 2) || !ft_strncmp(input, "&&", 2))
+    if (!ft_strncmp(*input, "||", 2) || !ft_strncmp(*input, "&&", 2))
         return (TOKEN_LOGICAL);
 
     // Check for pipe symbol '|'
-    if (!ft_strncmp(input, "|", 1))
+    if (!ft_strncmp(*input, "|", 1))
         return (TOKEN_PIPE);
 
     // Check for redirection operators ('<' or '>')
-    if (!ft_strncmp(input, ">", 1) || !ft_strncmp(input, "<", 1))
+    if (!ft_strncmp(*input, ">", 1) || !ft_strncmp(*input, "<", 1))
         return (TOKEN_REDIRECT);
 
     return (TOKEN_TEXT); // Default to plain text token
@@ -108,11 +108,14 @@ t_sh_token *sh_tokenizer_input(char *input, t_quote_state qstat)
     else
         token_content = ft_strndup(input, current_pos - input);
 
-    if (ft_strncmp(token_content, " ", 2)) // Ignore standalone spaces as tokens
-        result = sh_create_token(ft_strdup(token_content), sh_classify_token(input, qstat));
+    if (ft_strncmp(token_content, " ", 2))// Ignore standalone spaces as tokens
+    {
+        char *token_copy = ft_strdup(token_content);
 
+        result = sh_create_token(&token_copy, sh_classify_token(&token_content, qstat));
+    }
     // Recursively parse the rest of the input
-    append_token(&result, parse_into_tokens(input + ft_strlen(token_content), qstat));
+    sh_append_token(&result, sh_tokenizer_input(input + ft_strlen(token_content), qstat));
 
     free(token_content);
     return (result);
@@ -159,7 +162,7 @@ int sh_contains_unquoted_wildcard(char *input, t_quote_state qstat)
  * @param token_list Pointer to the token list.
  * @param home_var The home environment variable.
  */
-void sh_expand_tilde(t_sh_token **token_list, t_envvar *home_var)
+void sh_expand_tilde(t_sh_token **token_list, t_sh_env *home_var)
 {
     t_sh_token *current;
 
@@ -167,12 +170,12 @@ void sh_expand_tilde(t_sh_token **token_list, t_envvar *home_var)
     while (current)
     {
         // Check if token is '~' and replace it with the home directory path
-        if (!ft_strncmp(current->str, "~", 2))
+        if (!ft_strncmp(current->content, "~", 2))
         {
             if (home_var)
             {
-                free(current->str);
-                current->str = sh_format_env_var(home_var, 0, 0);
+                free(current->content);
+                current->content = sh_format_env_var(home_var, 0, 0);
             }
             current = current->next;
         }
