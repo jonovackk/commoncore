@@ -1,4 +1,5 @@
-#include "libft.h"
+#include "../includes/libft.h"
+
 
 static void	ft_manage_strings(char *s1, char *s2, char *c, int buffered)
 {
@@ -16,6 +17,7 @@ char	*ft_strjoin(char *s1, char *s2, char *c, int tofree)
 	int		buffered;
 	size_t	len1;
 	size_t	len2;
+	size_t	lenc;
 
 	buffered = (!s1 + (2 * !s2)) | tofree;
 	if (!s1)
@@ -24,14 +26,19 @@ char	*ft_strjoin(char *s1, char *s2, char *c, int tofree)
 		s2 = ft_strdup("");
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
-	ns = malloc((len1 + len2 + 1 + ft_strlen(c)) * sizeof(char));
+	if (c != NULL)
+		lenc = ft_strlen(c);
+	else
+		lenc = 0;
+	ns = malloc((len1 + len2 + lenc + 1) * sizeof(char));
 	if (ns == NULL)
-		return (ns);
-	*ns = 0;
+		return (NULL);
+	*ns = '\0';
 	ft_strcat(ns, s1);
-	if (c)
+	if (c != NULL)
 		ft_strcat(ns, c);
 	ft_strcat(ns, s2);
 	ft_manage_strings(s1, s2, c, buffered);
 	return (ns);
 }
+

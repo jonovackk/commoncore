@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_cd_h.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:05:23 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:05:27 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -151,7 +163,7 @@ int sh_execute_cd(t_sh_cmd *cmd)
         sh_display_error(ERR_VAR_UNSET, "OLDPWD");
 
     // Get the current working directory and update the PWD environment variable
-    newdir = sh_get_cwd();
+    newdir = sh_get_pwd();
     if (newdir)
         sh_update_env(cmd->environment, "PWD", newdir);
     else

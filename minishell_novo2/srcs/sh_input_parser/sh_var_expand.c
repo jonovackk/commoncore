@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_var_expand.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:44 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:45 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
-extern int g_exit_code;
+extern int g_shell_exit_status;
 
 /**
  * @brief Calculates the length of an environment variable.
@@ -81,7 +93,7 @@ void sh_insert_env_vars(t_sh_env *env, char *s, char ***res_parts, t_quote_state
     // Handle special case for exit code ('$?')
     if (*s && *(s + 1) == '?')
     {
-        ft_strapp(res_parts, ft_itoa(g_exit_code));  // Append exit code to result parts.
+        ft_strapp(res_parts, ft_itoa(g_shell_exit_status));  // Append exit code to result parts.
         return;
     }
 
@@ -96,7 +108,7 @@ void sh_insert_env_vars(t_sh_env *env, char *s, char ***res_parts, t_quote_state
 
     // Handle the case where the key starts with a quote.
     if (ft_strchr("\"'", *s))
-        ft_strapp(res_parts, ft_strndups(s - 1, 2));
+        ft_strapp(res_parts, ft_strndup(s - 1, 2));
 
     // If it's a quoted string, stop processing.
     if (ft_strchr("\"'", *s))

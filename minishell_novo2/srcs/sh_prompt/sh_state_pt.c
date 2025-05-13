@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_state_pt.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:08:24 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:08:25 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -57,10 +69,10 @@ char *sh_double_quote_state(char *addr, int type)
   if (!sh_hd_filename || (addr && type == 0))
     sh_hd_filename = addr;
   // update delimiter if not set or explicit update requested
-  else if (!sh_hd_delimiter || (addr && type == 1))
-    sh_hd_delimiter == addr;
+  else if ((!sh_hd_delimiter || (addr && type == 1)))
+    sh_hd_delimiter = addr;
   // update fd if not set or explicit update requested
-  else if (sh_hd_fd == -1 || (addr && type == 2))
+  else if ((sh_hd_fd = -1 || (addr && type == 2)))
     sh_hd_fd = *(int *)addr;
   // return filename for type 0
   if (type == 0)
@@ -86,6 +98,7 @@ char *sh_double_quote_state(char *addr, int type)
 
  t_sh_node *sh_command_tree_state(int reset, t_sh_node *root)
  {
+  (void)reset;
   //static storage for command tree root
   static t_sh_node *sh_command_tree_state = NULL;
   // update tree root if new root is provided

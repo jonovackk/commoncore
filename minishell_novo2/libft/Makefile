@@ -14,27 +14,25 @@
 SOURCES = sources/conv_functions/ft_atoi.c \
 	sources/conv_functions/ft_itoa.c \
 	sources/conv_functions/ft_itoa.c \
-	sources/desc_file/ft_putchar_fd.c \
-	sources/desc_file/ft_putendl_fd.c \
-	sources/desc_file/ft_putnbr_fd.c \
-	sources/desc_file/ft_putstr_fd.c \
 	sources/mnpl_char/ft_isalnum.c \
 	sources/mnpl_char/ft_isalpha.c \
 	sources/mnpl_char/ft_isascii.c \
 	sources/mnpl_char/ft_isdigit.c \
 	sources/mnpl_char/ft_isprint.c \
+	sources/mnpl_char/ft_isspace.c \
 	sources/mnpl_char/ft_putchar.c \
 	sources/mnpl_char/ft_putnbr.c \
 	sources/mnpl_char/ft_tolower.c \
 	sources/mnpl_char/ft_toupper.c \
+	sources/mnpl_char/ft_max.c \
 	sources/mnpl_memory/ft_bzero.c \
 	sources/mnpl_memory/ft_calloc.c \
 	sources/mnpl_memory/ft_memchr.c \
+	sources/mnpl_memory/ft_free_tab.c \
 	sources/mnpl_memory/ft_memcmp.c \
 	sources/mnpl_memory/ft_memcpy.c \
 	sources/mnpl_memory/ft_memmove.c \
 	sources/mnpl_memory/ft_memset.c \
-	sources/mnpl_memory/ft_strdup.c \
 	sources/mnpl_str/ft_puthex.c \
 	sources/mnpl_str/ft_putptr.c \
 	sources/mnpl_str/ft_putstr.c \
@@ -42,15 +40,21 @@ SOURCES = sources/conv_functions/ft_atoi.c \
 	sources/mnpl_str/ft_strchr.c \
 	sources/mnpl_str/ft_striteri.c \
 	sources/mnpl_str/ft_strjoin.c \
+	sources/mnpl_str/ft_strsjoin.c \
+	sources/mnpl_str/ft_strjoin2.c \
 	sources/mnpl_str/ft_strlcat.c \
 	sources/mnpl_str/ft_strlcpy.c \
 	sources/mnpl_str/ft_strlen.c \
+	sources/mnpl_str/ft_sort_strs.c \
 	sources/mnpl_str/ft_strmapi.c \
 	sources/mnpl_str/ft_strncmp.c \
 	sources/mnpl_str/ft_strnstr.c \
 	sources/mnpl_str/ft_strrchr.c \
 	sources/mnpl_str/ft_strtrim.c \
 	sources/mnpl_str/ft_substr.c \
+	sources/mnpl_str/ft_tab_len.c \
+	sources/mnpl_str/ft_strdup.c \
+	sources/mnpl_str/ft_strcspn.c \
 	sources/get_next_line/get_next_line.c \
 	sources/ft_printf/ft_printf.c \
 	sources/ft_printf/ft_print_char.c \
@@ -60,6 +64,8 @@ SOURCES = sources/conv_functions/ft_atoi.c \
 	sources/ft_printf/ft_print_ptr.c \
 	sources/ft_printf/ft_print_str.c \
 	sources/ft_printf/ft_print_num_base.c \
+	sources/ft_printf/ft_dprintf.c \
+	sources/ft_printf/ft_dprint_utils.c \
 	sources/ft_printf/ft_print_num.c
 
 OBJS = $(SOURCES:.c=.o)

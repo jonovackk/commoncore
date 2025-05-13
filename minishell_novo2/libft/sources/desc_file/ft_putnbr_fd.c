@@ -21,18 +21,19 @@
  *   fd - The file descriptor to which the integer is written.
  */
 
-void	ft_putnbr_fd(int n, int fd)
-{
-	unsigned int	num;
-
-	if (n < 0)
-	{
-		ft_putchar_fd('-', fd);
-		num = (unsigned int)(n * -1);
-	}
-	else
-		num = (unsigned int)n;
-	if (num >= 10)
-		ft_putnbr_fd(num / 10, fd);
-	ft_putchar_fd(num % 10 + 48, fd);
-}
+ void	ft_putnbr_fd(int n, int fd)
+ {
+	 unsigned int	num;
+ 
+	 if (n < 0)
+	 {
+		 ft_putchar_fd('-', fd);
+		 num = (unsigned int)(n * -1);
+	 }
+	 else
+		 num = (unsigned int)n;
+	 if (num >= 10)
+		 ft_putnbr_fd(num / 10, fd);
+	 ft_putchar_fd(num % 10 + 48, fd);
+ }
+ 

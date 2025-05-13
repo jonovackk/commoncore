@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_input_tokenizer.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:24 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:25 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -29,8 +41,11 @@ int sh_is_shell_operator(char *input, t_quote_state qstat)
     while (*current && (ft_strncmp(input, *current, ft_strlen(*current)) || qstat != QUOTE_NONE))
         current++;
 
-    return (ft_strlen(*current)); // Return operator length if found
+    if (*current)
+        return (ft_strlen(*current)); // Match found
+    return (0); // No match found
 }
+
 
 /**
  * @brief Determines the token category of the input.

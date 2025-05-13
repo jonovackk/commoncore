@@ -6,10 +6,9 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:49:03 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/05 13:05:39 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/05/12 15:07:51 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../../includes/minishell.h"
 
@@ -61,55 +60,74 @@ void    sh_validate_builtin_direct(int (*builtin_func)(t_sh_cmd *), t_sh_cmd *cm
     sh_cmd_cleanup(cmd);
 }
 
-error_t     sh_validate_builtin_flags(t_sh_cmd *cmd)
+error_t sh_validate_builtin_flags(t_sh_cmd *cmd)
 {
-    char    **tmp;
+    char **tmp;
+
+    if (!cmd || !cmd->arguments || !*cmd->arguments)
+        return (ERR_NONE);
 
     tmp = cmd->arguments;
     if (!ft_strncmp(*tmp, "echo", 5))
         return (ERR_NONE);
+
     tmp++;
-    if (!ft_strncmp(*(tmp -1), "cd", 3) && !ft_strncmp(*tmp, "-", 2))
+    if (!ft_strncmp(*(tmp - 1), "cd", 3) && *tmp && !ft_strncmp(*tmp, "-", 2))
         return (ERR_NONE);
+
     while (*tmp && **tmp != '-')
         tmp++;
+
     if (*tmp)
     {
-        sh_display_error(ERR_INVALID_OPTION,*tmp);
+        sh_display_error(ERR_INVALID_OPTION, *tmp);
         g_shell_exit_status = 125;
         return (ERR_INVALID_OPTION);
     }
+
     return (ERR_NONE);
 }
 
-error_t     sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec_t mode)
+
+error_t sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx, exec_t mode)
 {
-    char    *trim;
-    char    **index;
-    static int  (*builtins[7])(t_sh_cmd *) = {
+    char *trim;
+    char **index;
+    static int (*builtins[7])(t_sh_cmd *) = {
         &sh_execute_cd, &sh_execute_pwd, &sh_echo_execute,
         &sh_execute_env, &sh_execute_export, &sh_execute_unset, &sh_execute_exit
     };
     static char *builtin_strs[8] = {
         "cd", "pwd", "echo", "env", "export", "unset", "exit", NULL
     };
-    
-    index = builtin_strs;
+
+    if (!cmd || !cmd->executable)
+        return (ERR_ERRORS);
+
     trim = ft_backtrim(cmd->executable, '/');
-    while (*index && ft_strncmp(*index, trim, ft_strlen (*index) + 1))
+    if (!trim)
+        return (ERR_ERRORS);
+
+    index = builtin_strs;
+    while (*index && ft_strncmp(*index, trim, ft_strlen(*index) + 1))
         index++;
     free(trim);
+
     if (!*index)
         return (ERR_ERRORS);
+
     if (cmd->input_fd == STDIN_FILENO && fd[0] != STDERR_FILENO)
         cmd->input_fd = fd[0];
     if (cmd->output_fd == STDOUT_FILENO && fd[1] != STDOUT_FILENO)
         cmd->output_fd = fd[1];
+
     if (sh_validate_builtin_flags(cmd))
         return (ERR_NONE);
+
     if (mode == EXEC_PIPE)
-    sh_execute_builtin_piped(builtins[index - builtin_strs], cmd, exec_ctx);
+        sh_execute_builtin_piped(builtins[index - builtin_strs], cmd, exec_ctx);
     else
-    sh_validate_builtin_direct(builtins[index - builtin_strs], cmd, exec_ctx);
+        sh_validate_builtin_direct(builtins[index - builtin_strs], cmd, exec_ctx);
+
     return (ERR_NONE);
 }

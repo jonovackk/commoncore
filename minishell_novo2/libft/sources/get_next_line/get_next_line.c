@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jnovack <jnovack@student.42luxembourg      +#+  +:+       +#+        */
+/*   By: brunmart <brunmart@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 11:25:52 by jnovack           #+#    #+#             */
-/*   Updated: 2024/11/14 11:25:57 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/05/12 10:06:39 by brunmart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*get_next_line(int fd)
 			string = ft_strdup(buffer);
 		else
 		{
-			support = ft_strjoin(string, buffer);
+			support = ft_strjoin2(string, buffer);
 			ft_free(&string);
 			string = support;
 		}

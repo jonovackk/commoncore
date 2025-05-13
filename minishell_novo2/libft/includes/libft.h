@@ -37,6 +37,7 @@ int		ft_tolower(int c);
 int		ft_putchar(char c);
 int		ft_putnbr(int nb);
 int		ft_isspace(int c);
+int		ft_max(int a, int b);
 
 
 //# ------------------------------------
@@ -53,7 +54,6 @@ int		ft_strncmp(const char *s1, const char *s2, size_t n);
 char	*ft_strnstr(const char *big, const char *little,
 			size_t len);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strjoin(char *s1, char *s2, char *c, int tofree);
 char	*ft_strsjoin(char **strs, char *sep, int tofree);
 char	*ft_strtrim(char const *s1, char const *set);
 char	**ft_split(const char *s, char c);
@@ -69,7 +69,10 @@ void	ft_sort_strs_tab(char **tab, int size);
 void	ft_sort_lowstrs_tab(char **tab, int size);
 int		ft_strcspn(char *s, char *rejects);
 char	*ft_strtok(char *str, char *token);
-
+int		ft_strcmp(char *s1, char *s2);
+char	*ft_strcat(char *dest, char *src);
+char	*ft_strjoin(char *s1, char *s2, char *c, int tofree);
+char	*ft_strjoin2(char const *s1, char const *s2);
 
 //# ------------------------------------
 //# Functions to Manipulate Memory #####
@@ -96,11 +99,22 @@ int		ft_atoi(const char *nptr);
 //# ------------------------------------
 //# Functions File Descriptor      #####
 //# ------------------------------------
-
+/*
 void	ft_putchar_fd(char c, int fd);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
+*/
+//# ------------------------------------
+//# Dprint utils      #####
+//# ------------------------------------
+
+size_t	ft_putchar_fd(int fd, char c);
+size_t	ft_putstr_fd(int fd, char *str);
+size_t	ft_putnbr_hex_fd(int fd, unsigned long nb, int flags, int depth);
+size_t	ft_putnbr_fd(int fd, long nb);
+size_t	ft_putunbr_fd(int fd, unsigned long nb);
+void	ft_putendl_fd(char *s, int fd);
 
 //# ------------------------------------
 //# Get Next Line                  #####

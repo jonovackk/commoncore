@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_quote_procs.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:32 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/13 10:30:20 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
-extern int g_exit_code;
+extern int g_shell_exit_status;
 
 /**
  * @brief Ensures quotes are properly closed in the input line.
@@ -93,31 +105,39 @@ t_quote_state sh_detect_quotes(char *line, char *end_marker, t_quote_state state
  */
 void sh_rmv_quotes(char **line, t_quote_state state)
 {
-    char *ptr;
-    char *result;
-    char *res_ptr;
+    (void)state;
+    
+    printf("ANTES : [%s]\n", *line);
+    char *src = *line;
+    char *dst = malloc(strlen(*line) + 1);
+    char *res_ptr = dst;
+    int in_single = 0;
+    int in_double = 0;
 
-    ptr = *line;
-
-    // Allocate space for the result string without quotes
-    result = malloc((sh_ignoring_quotes(*line) + 1) * sizeof(char));
-    if (!result)
+    if (!dst)
         return;
 
-    res_ptr = result;
-
-    while (*ptr)
+    while (*src)
     {
-        // Skip quotes while updating the quote state
-        if (sh_update_quote_state(*ptr, &state))
+        if (*src == '\'' && !in_double)
         {
-            ptr++;
+            in_single = !in_single;
+            src++;
             continue;
         }
-        *(res_ptr++) = *(ptr++);
+        else if (*src == '\"' && !in_single)
+        {
+            in_double = !in_double;
+            src++;
+            continue;
+        }
+
+        *res_ptr++ = *src++;
     }
 
-    *res_ptr = '\0'; // Null-terminate the new string
+    *res_ptr = '\0';
     free(*line);
-    *line = result; // Update original pointer with modified string
+    *line = dst;
+
+    printf("DEPOIS: [%s]\n", *line);
 }

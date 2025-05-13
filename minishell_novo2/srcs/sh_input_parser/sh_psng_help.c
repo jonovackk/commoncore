@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_psng_help.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:28 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:29 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -25,7 +37,7 @@ int sh_update_quote_state(char c, t_quote_state *qstatus)
         if (c == '"')
             *qstatus = QUOTE_DOUBLE; // Enter double-quote mode
     }
-    else if ((c == '\'' && *qstatus == QUOTE_SINGLE) || (c == '"' && *qstatus == QT_DOUBLE))
+    else if ((c == '\'' && *qstatus == QUOTE_SINGLE) || (c == '"' && *qstatus == QUOTE_DOUBLE))
         *qstatus = QUOTE_NONE; // Exit quotes if closing match is found
 
     return (*qstatus != previous); // Return whether the state changed
@@ -79,7 +91,7 @@ void sh_rmv_inv_parentheses(t_sh_token **tokens)
         // If the current token has invalid parentheses, remove it
         if (!sh_check_ops_in_brackets(current))
         {
-            delet_token(&current); // Delete invalid token
+            sh_delete_token(&current); // Delete invalid token
 
             if (!current)
             {

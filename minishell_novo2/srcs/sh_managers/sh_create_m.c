@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_create_m.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:57 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:58 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 t_sh_env *sh_create_env_var(char *input)
@@ -28,22 +40,32 @@ t_sh_env *sh_create_env_var(char *input)
 
 t_sh_cmd *sh_create_cmd(t_sh_redir *redirects, char **args, t_sh_env **env)
 {
-    t_sh_cmd   *cmd;
+    t_sh_cmd *cmd;
 
     cmd = malloc(sizeof(t_sh_cmd));
     if (!cmd)
         return (NULL);
+
     cmd->input_fd = 0;
     cmd->output_fd = 1;
     cmd->heredoc_fd = -42;
     cmd->redirects = redirects;
-    cmd->executable = NULL;
-    if (args)
+
+    if (args && *args)
+    {
         cmd->executable = sh_find_path(*args, *env);
+        if (!cmd->executable)
+            cmd->executable = ft_strdup(*args);
+    }
+    else
+        cmd->executable = NULL;
+
     cmd->arguments = args;
     cmd->environment = env;
+
     return (cmd);
 }
+
 
 t_sh_node *sh_create_exec_node(t_sh_cmd *cmd, t_sh_token *token)
 {
@@ -52,14 +74,14 @@ t_sh_node *sh_create_exec_node(t_sh_cmd *cmd, t_sh_token *token)
     node = malloc(sizeof(t_sh_node));
     if (!node)
         return (NULL);
-    node->command = cmd;
+    node->cmd = cmd;
     node->token = token;
     node->left = NULL;
     node->right = NULL;
     return (node);
 }
 
-t_sh_token *sh_create_token(char *text, t_token_kind kind)
+t_sh_token *sh_create_token(char **text, t_token_kind kind)
 {
     t_sh_token  *token;
 

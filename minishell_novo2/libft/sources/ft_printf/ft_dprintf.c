@@ -1,5 +1,5 @@
-#include "libft.h"
-
+#include "../includes/ft_printf.h"
+#include "../includes/libft.h"
 int	ft_format(int fd, va_list args, char c)
 {
 	if (c == 'c')

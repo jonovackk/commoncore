@@ -12,8 +12,6 @@
 
 #include "../includes/libft.h"
 
-#include "libft.h"
-
 static void	ft_manage_strings(char **strs, char *sep, int tf)
 {
 	if (tf & 0b01)

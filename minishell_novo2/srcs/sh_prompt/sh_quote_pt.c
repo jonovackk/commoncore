@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_quote_pt.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:08:21 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:08:22 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 // defined g_shell_exit_status in global.c
@@ -86,7 +98,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
     // create tmp file
     tmp_fd = open (tmp, O_CREAT | O_EXCL | O_WRONLY, 0600);
     // store fd for later use
-    sh_set_quote_holder((char *)&tmp_fd, 1);
+    sh_double_quote_state((char *)&tmp_fd, 1);
     // clean up resources
     rl_clear_history();
     sh_destroy_env_list(*env);
@@ -127,10 +139,10 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
   char *quote_str;
   // validate input line
   if (!*line)
-    return (ERR_ERROR);
+    return (ERR_ERRORS);
   history_line = *line;
   // create tmp file for quote processing
-  dquote_file = sh_create_tempfile(".dquote", 16);
+  dquote_file = generate_temp_filename(".dquote", 16);
   // check if quote processing is needed
   if (sh_detect_quotes(*line, NULL, QUOTE_NONE))
   {
@@ -143,7 +155,7 @@ char *sh_opendquote(int tmp_fd, t_quote_state quote_state)
   free(dquote_file);
   *line = history_line;
   // handle interrupt status
-  if (WEXISTSTATUS(status) == 130)
+  if (WEXITSTATUS(status) == 130)
   {
     free (*line);
     return (ERR_FAIL_GENERAL);

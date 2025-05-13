@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_wildcard_matcher.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:47 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/13 10:50:44 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -185,7 +197,7 @@ void sh_replace_wildcards(char **str)
     if (!unquoted_str)
         return;
 
-    sh_rmv_quotes(&unquoted_str, QUOTE_NONE); // Remove any surrounding quotes
+ // sh_rmv_quotes(&unquoted_str, QUOTE_NONE); // Remove any surrounding quotes
     matched_files = sh_get_matching_files(unquoted_str); // Get files matching the pattern
     free(unquoted_str);
 

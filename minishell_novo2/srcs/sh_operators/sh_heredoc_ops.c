@@ -1,4 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_heredoc_ops.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:07:58 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/13 10:50:11 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
+
+extern int	g_shell_exit_status;
 
 /**
  * @brief Handles heredoc limit error
@@ -71,7 +85,7 @@ int sh_process_heredoc_line(char *delimiter, char *temp_file, int fd)
   // determine if var expansion is needed
   should_expand = !(ft_strchr(delimiter, '"') || ft_strchr(delimiter, '\''));
   // remove quotes from frlimiter
-  sh_rmv_quotes(&delimiter, QUOTE_NONE);
+  //sh_rmv_quotes(&delimiter, QUOTE_NONE);
   // store tmp file and delimiter for signal handling
   sh_heredoc_state(temp_file, 0);
   sh_heredoc_state(delimiter, 1);

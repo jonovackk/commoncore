@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_pwd_h.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:13 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:14 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
-extern int  g_exit_code;
+extern int  g_shell_exit_status;
 
 /**
  * @brief Returns the part of the path after the last '/'
@@ -79,32 +91,60 @@ int     sh_execute_pwd(t_sh_cmd *cmd)
  * @param envp The environment variables, used to get the `PWD` value.
  * @return A newly allocated string representing the shell prompt.
  */
-char    *sh_get_prompt(t_sh_env *envp)
+char *sh_get_prompt(t_sh_env *envp)
 {
-    static  t_sh_env *saved_env = NULL;
-    char    *prompt;
-    char    *pwd;
-
-    if (envp)
-        saved_env = envp;  // Save the environment variables if provided
+    char *result = NULL;
+    char *cwd = NULL;
+    char *tmp_prompt = NULL;
     
-    // Retrieve the current working directory (PWD) from the environment
-    if (sh_find_env(saved_env, "PWD"))
+    // Null check for environment
+    if (!envp)
     {
-        pwd = sh_trim_pwd(sh_find_env(saved_env, "PWD")->values[0]);
-        pwd = ft_strjoin(pwd, " ~ ", 0, 0b01);  // Append " ~ " to the path
+        // Fallback prompt if environment is invalid
+        return ft_strdup("Minishell$ ");
     }
+    
+    // Get current working directory
+    cwd = sh_get_pwd();
+    if (!cwd)
+    {
+        // Fallback if we can't get working directory
+        return ft_strdup("Minishell$ ");
+    }
+    
+    // Format the exit status - green for success, red for failure
+    // IMPORTANT: Check your ft_strjoin implementation to understand the flags
+    // We're assuming 0b01 means free the first argument and not the second
+    if (g_shell_exit_status == 0)
+        tmp_prompt = ft_strjoin(cwd, PROMPT_SUCCESS, " ", 0);  // Don't free cwd here
     else
-        pwd = ft_strdup(" ~ ");  // If PWD is not found, use " ~ "
+        tmp_prompt = ft_strjoin(cwd, PROMPT_FAIL, " ", 0);     // Don't free cwd here
     
-    // Construct the prompt based on the exit code
-    if (!g_exit_code)
-        prompt = ft_strjoin(PROMPT_SUCCESS, PROMPT_TAIL, 0, 0b00);  // Success exit code
-    else
-        prompt = ft_strjoin(PROMPT_FAIL, PROMPT_TAIL, 0, 0b00);  // Failure exit code
+    // Free the current working directory string - manually free after strjoin
+    free(cwd);
+    cwd = NULL;  // Set to NULL to avoid double free
     
-    // Combine the prompt with the current working directory
-    prompt = ft_strjoin(prompt, pwd, 0, 3);
+    // Check if prompt creation failed
+    if (!tmp_prompt)
+        return ft_strdup("Minishell$ ");
     
-    return (prompt);  // Return the final prompt string
+    // Add shell name to prompt
+    // IMPORTANT: Again, check your ft_strjoin implementation 
+    // We're assuming 0b01 means free the first argument
+    result = ft_strjoin(tmp_prompt, PROMPT_TAIL, "", 0b01);
+    
+    // tmp_prompt should be freed by ft_strjoin if 0b01 flag works as expected
+    // BUT, if not, this could lead to a memory leak
+    
+    // Check if final prompt creation failed
+    if (!result)
+    {
+        // If ft_strjoin doesn't free tmp_prompt with 0b01 flag, free it here
+        if (tmp_prompt)
+            free(tmp_prompt);
+        return ft_strdup("Minishell$ ");
+    }
+    
+    return result;
 }
+

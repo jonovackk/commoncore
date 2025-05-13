@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_node_m.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:07:12 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:07:13 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 void    sh_set_parent_node(t_sh_node **root, t_sh_node *new_parent, int pos)
@@ -49,9 +61,9 @@ void    sh_destroy_node(t_sh_node *node)
     if (!node)
         return;
     if (node->token)
-        delete_token(node->token);
-    if (node->command)
-        sh_free_cmd(node->command);
+        sh_token_free(node->token);
+    if (node->cmd)
+        sh_free_cmd(node->cmd);
     free(node);
 }
 
@@ -62,8 +74,8 @@ void        sh_destroy_tree(t_sh_node *node)
     sh_destroy_tree(node->left);
     sh_destroy_tree(node->right);
     if (node->token)
-        delete_token(node->token);
-    if (node->command)
-        sh_free_cmd(node->command);
+        sh_token_free(node->token);
+    if (node->cmd)
+        sh_free_cmd(node->cmd);
     free(node);
 }

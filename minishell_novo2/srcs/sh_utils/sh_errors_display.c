@@ -1,4 +1,16 @@
-#include "../includes/minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_errors_display.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:08:35 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:08:46 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/minishell.h"
 
 /**
  * @brief Handles additional errOR scenarios
@@ -58,7 +70,7 @@
  * @param str Context string for the errOR
  */
 
-void sh_display_errOR(error_t error, char *str)
+void sh_display_error(error_t error, char *str)
 {
   // env var not set
   if (error == ERR_VAR_UNSET)

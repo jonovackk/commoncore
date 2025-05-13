@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_exit_h.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:05:45 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:05:46 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
-extern int  g_exit_code;
+extern int  g_shell_exit_status;
 
 /**
  * @brief Converts a string to a long integer, returning it as a valid exit status code.
@@ -100,7 +112,7 @@ void sh_handle_exit(int exit_code, error_t ec, t_sh_cmd *cmd)
  * @param cmd The command structure containing the arguments passed to the `exit` command.
  * @return 1 if there were too many arguments, otherwise it exits the program.
  */
-int t_execute_exit(t_sh_cmd *cmd)
+int sh_execute_exit(t_sh_cmd *cmd)
 {
     int argc;
 
@@ -114,7 +126,7 @@ int t_execute_exit(t_sh_cmd *cmd)
 
     // If no arguments are passed, exit with the global exit code
     if (!cmd || !argc)
-        sh_handle_exit(g_exit_code, ERR_NONE, cmd);
+        sh_handle_exit(g_shell_exit_status, ERR_NONE, cmd);
 
     // If the argument is non-numeric, print an error and exit
     if (!ft_is_numeric(cmd->arguments[1]))

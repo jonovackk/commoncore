@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_tree_build.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:06:40 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:06:41 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 /**
@@ -94,10 +106,15 @@ void sh_connect_ops(t_sh_token **tk, t_sh_node **tree, t_sh_env **env)
     }
     else if ((*tk)->type & TOKEN_PIPE)
     {
-        sh_set_parent_node(tree, sh_create_exec_node(NULL, sh_clone_token(*tk)), LEFT);
-        (*tk) = (*tk)->next;
+        // Correção: garante que o cmd não é NULL
+        t_sh_cmd *dummy_cmd = sh_create_cmd(NULL, NULL, env);
+        t_sh_node *pipe_node = sh_create_exec_node(dummy_cmd, sh_clone_token(*tk));
+        sh_set_parent_node(tree, pipe_node, LEFT);
+
+        *tk = (*tk)->next;
     }
 }
+
 
 /**
  * @brief Builds an abstract syntax tree from tokens

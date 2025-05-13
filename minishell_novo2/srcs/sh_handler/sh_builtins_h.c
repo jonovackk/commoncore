@@ -1,4 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sh_builtins_h.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/12 15:05:08 by jnovack           #+#    #+#             */
+/*   Updated: 2025/05/12 15:05:15 by jnovack          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/minishell.h"
 
 int	ft_is_numeric(char *str)
 {
@@ -23,14 +35,14 @@ int	ft_is_numeric(char *str)
 
 char	*ft_backtrim(char *str, char c)
 {
-	char	*tmp;
 	char	*chr;
 
+	if (!str)
+		return (NULL);
 	chr = ft_strrchr(str, c);
-	tmp = NULL;
-	if (chr && *chr && *(chr + 1))
-		tmp = ft_strndup(chr + 1, ft_strlen(str) - (chr - str));
-	return (tmp);
+	if (!chr || !*(chr + 1))
+		return ft_strdup(str);
+	return ft_strdup(chr + 1);
 }
 
 char	**ft_strtab(char *str)

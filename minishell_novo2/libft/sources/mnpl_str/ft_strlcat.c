@@ -46,3 +46,18 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	*dest = '\0';
 	return (dest_len + src_len);
 }
+
+char	*ft_strcat(char *dest, char *src)
+{
+	char	*tmp;
+
+	tmp = dest;
+	if (!dest || !src)
+		return (NULL);
+	while (*dest)
+		dest++;
+	while (*src)
+		*(dest++) = *(src++);
+	*dest = 0;
+	return (tmp);
+}

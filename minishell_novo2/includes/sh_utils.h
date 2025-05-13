@@ -24,4 +24,7 @@ int     is_non_empty(const char *str);
 char    *generate_temp_filename(const char *prefix, int length);
 int     main(int argc, char **argv, char **envp);
 
+t_quote_state detect_quote_type(const char *str);
+
+
 #endif

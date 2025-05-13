@@ -1,4 +1,4 @@
-#include "libft.h"
+#include "../../includes/libft.h"
 
 int	ft_strcspn(char *s, char *rejects)
 {

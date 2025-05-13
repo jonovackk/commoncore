@@ -1,4 +1,20 @@
-#include "libft.h"
+#include "../../includes/libft.h"
+
+char	*ft_strlow(char *str)
+{
+	char	*cpy;
+	char	*tmp;
+
+	cpy = ft_strdup(str);
+	tmp = cpy;
+	while (*tmp)
+	{
+		if (ft_toupper(*tmp))
+			*tmp += 32;
+		tmp++;
+	}
+	return (cpy);
+}
 
 void	ft_swap_strs(char **a, char **b)
 {

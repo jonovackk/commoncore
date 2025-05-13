@@ -1,4 +1,4 @@
-#include "libft.h"
+#include "../includes/libft.h"
 
 char	*ft_strndup(char *str, int n)
 {

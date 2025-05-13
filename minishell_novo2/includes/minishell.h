@@ -29,7 +29,7 @@
 # include "sh_prompt.h"
 # include "sh_utils.h"
 
-int	g_shell_exit_status;
+extern int	g_shell_exit_status;
 
 /* Prompt Messages */
 # define PROMPT_SUCCESS "\001\033[32;1m\002$?\001\033[0m\002 "
