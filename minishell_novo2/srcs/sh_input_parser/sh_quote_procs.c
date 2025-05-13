@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:06:32 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/13 10:30:20 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/05/13 13:36:05 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,7 @@ t_quote_state sh_detect_quotes(char *line, char *end_marker, t_quote_state state
 void sh_rmv_quotes(char **line, t_quote_state state)
 {
     (void)state;
-    
-    printf("ANTES : [%s]\n", *line);
+
     char *src = *line;
     char *dst = malloc(strlen(*line) + 1);
     char *res_ptr = dst;
@@ -138,6 +137,7 @@ void sh_rmv_quotes(char **line, t_quote_state state)
     *res_ptr = '\0';
     free(*line);
     *line = dst;
-
-    printf("DEPOIS: [%s]\n", *line);
 }
+
+
+

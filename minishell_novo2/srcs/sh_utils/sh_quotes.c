@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 09:58:19 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/13 11:20:49 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/05/13 13:57:02 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,34 @@
 
 t_quote_state detect_quote_type(const char *str)
 {
+    size_t len;
+
     if (!str)
         return QUOTE_NONE;
 
+    // Pula espaços iniciais
     while (*str == ' ')
         str++;
 
-    size_t len = strlen(str);
+    len = strlen(str);
     if (len < 2)
         return QUOTE_NONE;
 
-    if (str[0] == '\'' && str[len - 1] == '\'')
+    // Pula espaços finais
+    while (len > 0 && str[len - 1] == ' ')
+        len--;
+
+    // Agora a “janela” [0..len-1] contém o token sem espaços extras
+    if (len > 1 && str[0] == '\'' && str[len - 1] == '\'')
         return QUOTE_SINGLE;
-    if (str[0] == '\"' && str[len - 1] == '\"')
+    if (len > 1 && str[0] == '\"' && str[len - 1] == '\"')
         return QUOTE_DOUBLE;
 
     return QUOTE_NONE;
 }
+
+
+
+
 
 

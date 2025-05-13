@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:06:57 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/12 15:06:58 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/05/13 13:10:27 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ t_sh_token *sh_create_token(char **text, t_token_kind kind)
     token = malloc(sizeof(t_sh_token));
     if (!token)
         return (NULL);
-    token->content = *text;
+    token->content = ft_strdup(*text);
     token->type = kind;
     token->next = NULL;
     token->prev = NULL;
