@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:08:21 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:55:38 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 11:50:54 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,22 @@ int	sh_get_dquote(char *line, t_sh_env **env, char *tmp)
 	return (tmp_fd);
 }
 
-error_t	sh_quote_handler(char **line, t_sh_env **env, int status)
+static char	*sh_process_dquote(char *line, t_sh_env **env,
+					char *dquote_file, int *status)
+{
+	char	*result;
+
+	if (sh_detect_quotes(line, NULL, QUOTE_NONE))
+	{
+		*status = sh_get_dquote(line, env, dquote_file);
+		result = sh_get_dquote_line(line, dquote_file, *status);
+	}
+	else
+		result = line;
+	return (result);
+}
+
+t_error_t	sh_quote_handler(char **line, t_sh_env **env, int status)
 {
 	char	*dquote_file;
 	char	*history_line;
@@ -83,11 +98,7 @@ error_t	sh_quote_handler(char **line, t_sh_env **env, int status)
 		return (ERR_ERRORS);
 	history_line = *line;
 	dquote_file = generate_temp_filename(".dquote", 16);
-	if (sh_detect_quotes(*line, NULL, QUOTE_NONE))
-	{
-		status = sh_get_dquote(*line, env, dquote_file);
-		history_line = sh_get_dquote_line(*line, dquote_file, status);
-	}
+	history_line = sh_process_dquote(*line, env, dquote_file, &status);
 	add_history(history_line);
 	free(dquote_file);
 	*line = history_line;

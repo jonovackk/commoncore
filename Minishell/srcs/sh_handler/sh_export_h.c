@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:05:49 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/12 15:05:50 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 11:57:14 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int	sh_update_env_var(t_sh_cmd *cmd, char *tmp)
 
 int	sh_execute_export(t_sh_cmd *cmd)
 {
-	char	**tmp;
+	char		**tmp;
 	t_error_t	errcode;
 
 	tmp = cmd->arguments;

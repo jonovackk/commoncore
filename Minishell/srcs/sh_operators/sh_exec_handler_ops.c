@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:49:03 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 16:32:11 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:20:29 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ void	sh_validate_builtin_direct(int (*builtin_func)(t_sh_cmd *),
 	sh_cmd_cleanup(cmd);
 }
 
-error_t	sh_validate_builtin_flags(t_sh_cmd *cmd)
+t_error_t
+	sh_validate_builtin_flags(t_sh_cmd *cmd)
 {
 	char	**tmp;
 
@@ -75,30 +76,6 @@ error_t	sh_validate_builtin_flags(t_sh_cmd *cmd)
 	}
 	return (ERR_NONE);
 }
-error_t	sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx,
-		exec_t mode)
-{
-	int			index;
-	static int (*builtins[7])(t_sh_cmd *) = {&sh_execute_cd, &sh_execute_pwd,
-		&sh_echo_execute, &sh_execute_env, &sh_execute_export,
-		&sh_execute_unset, &sh_execute_exit};
-
-	index = sh_get_builtin_index(cmd);
-	if (index == -1)
-		return (ERR_ERRORS);
-	if (cmd->input_fd == STDIN_FILENO && fd[0] != STDERR_FILENO)
-		cmd->input_fd = fd[0];
-	if (cmd->output_fd == STDOUT_FILENO && fd[1] != STDERR_FILENO)
-		cmd->output_fd = fd[1];
-	if (sh_validate_builtin_flags(cmd))
-		return (ERR_NONE);
-	if (mode == EXEC_PIPE)
-		sh_execute_builtin_piped(builtins[index], cmd, exec_ctx);
-	else
-		sh_validate_builtin_direct(builtins[index], cmd, exec_ctx);
-	return (ERR_NONE);
-}
-
 int	sh_get_builtin_index(t_sh_cmd *cmd)
 {
 	char		*trim;
@@ -119,3 +96,29 @@ int	sh_get_builtin_index(t_sh_cmd *cmd)
 		return (-1);
 	return (index - builtin_strs);
 }
+
+t_error_t
+	sh_process_builtin(t_sh_cmd *cmd, int *fd, t_sh_exec *exec_ctx,
+		t_exec_t mode)
+{
+	int			index;
+	static int	(*builtins[7])(t_sh_cmd *) = {&sh_execute_cd, &sh_execute_pwd,
+		&sh_echo_execute, &sh_execute_env, &sh_execute_export,
+		&sh_execute_unset, &sh_execute_exit};
+
+	index = sh_get_builtin_index(cmd);
+	if (index == -1)
+		return (ERR_ERRORS);
+	if (cmd->input_fd == STDIN_FILENO && fd[0] != STDERR_FILENO)
+		cmd->input_fd = fd[0];
+	if (cmd->output_fd == STDOUT_FILENO && fd[1] != STDERR_FILENO)
+		cmd->output_fd = fd[1];
+	if (sh_validate_builtin_flags(cmd))
+		return (ERR_NONE);
+	if (mode == EXEC_PIPE)
+		sh_execute_builtin_piped(builtins[index], cmd, exec_ctx);
+	else
+		sh_validate_builtin_direct(builtins[index], cmd, exec_ctx);
+	return (ERR_NONE);
+}
+

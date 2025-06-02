@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:06:24 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:06:24 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:13:01 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ struct							s_sh_env_var
 
 struct							s_file_redirect
 {
-	redir_t					mode;
+	t_redir_t					mode;
 	char					*target;
 	struct s_file_redirect	*next;
 };

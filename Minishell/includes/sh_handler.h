@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:06:24 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:06:24 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:13:21 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 
 /* sh_cd_h.c */
 void	sh_dir_vars(t_sh_env *envp, t_sh_env **dir_vars);
-error_t	sh_change_directory(char *target);
-error_t	sh_cd_target(int argc, char **argv, t_sh_env **vars, int out);
+t_error_t	sh_change_directory(char *target);
+t_error_t	sh_cd_target(int argc, char **argv, t_sh_env **vars, int out);
 int		sh_execute_cd(t_sh_cmd *cmd);
 
 /* sh_echo_h.c*/
@@ -34,7 +34,7 @@ int		sh_execute_env(t_sh_cmd *cmd);
 
 /* sh_exit_h.c */
 long	sh_exit_status_atoi(char *str);
-void	sh_handle_exit(int exit_code, error_t ec, t_sh_cmd *cmd);
+void	sh_handle_exit(int exit_code, t_error_t ec, t_sh_cmd *cmd);
 int		sh_execute_exit(t_sh_cmd *cmd);
 
 /* sh_export_h.c */

@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:07:38 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 16:22:00 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:02:27 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	sh_run_cmd(t_sh_cmd *cmd, int *node_fd, t_sh_exec *exec_ctx)
 	}
 }
 
-error_t	sh_init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
+t_error_t	sh_init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 {
 	int	last_hd;
 
@@ -72,7 +72,7 @@ error_t	sh_init_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 	return (ERR_NONE);
 }
 
-error_t	sh_check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
+t_error_t	sh_check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 {
 	struct stat	s_buf;
 
@@ -92,7 +92,7 @@ error_t	sh_check_command(t_sh_cmd *cmd, t_sh_exec *exec_ctx)
 }
 
 void	sh_handle_command(t_sh_node *tree, int *node_fd, t_sh_exec *exec_ctx,
-		exec_t mode)
+		t_exec_t mode)
 {
 	char		*err_str;
 	t_sh_cmd	*command;

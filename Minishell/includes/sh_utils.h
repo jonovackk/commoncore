@@ -6,9 +6,10 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 15:06:24 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:06:24 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:16:28 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef SH_UTILS_H
 # define SH_UTILS_H
 
@@ -22,8 +23,8 @@ t_sh_env		*sh_env_init(char **argv, char **envp);
 
 /* sh_errors_display.c */
 /* Changed static function to non-static since it's used externally */
-void			sh_display_extended_errors(error_t err, char *str);
-void			sh_display_error(error_t err, char *str);
+void			sh_display_extended_errors(t_error_t err, char *str);
+void			sh_display_error(t_error_t err, char *str);
 
 /* sh_sig_handler.c */
 void			sh_signal_heredoc_mode(int signal);

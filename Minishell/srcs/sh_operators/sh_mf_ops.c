@@ -6,17 +6,17 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:08:05 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 13:34:31 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:09:49 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-error_t	sh_heredoc_init(t_sh_cmd *cmd)
+t_error_t	sh_heredoc_init(t_sh_cmd *cmd)
 {
-	error_t		err;
-	t_sh_redir	*tmp;
-	char		*hd_file;
+	t_error_t		err;
+	t_sh_redir		*tmp;
+	char			*hd_file;
 
 	err = ERR_NONE;
 	tmp = cmd->redirects;
@@ -37,7 +37,7 @@ error_t	sh_heredoc_init(t_sh_cmd *cmd)
 	return (cmd->heredoc_fd == FILE_ERROR);
 }
 
-error_t	sh_line_expand(t_sh_cmd *cmd, char **file)
+t_error_t	sh_line_expand(t_sh_cmd *cmd, char **file)
 {
 	char	**files;
 	char	*var;
@@ -60,7 +60,7 @@ error_t	sh_line_expand(t_sh_cmd *cmd, char **file)
 	return (ERR_NONE);
 }
 
-error_t	sh_heredoc_write(t_sh_cmd *cmd, char *file, int mode)
+t_error_t	sh_heredoc_write(t_sh_cmd *cmd, char *file, int mode)
 {
 	int	*fd;
 
@@ -89,10 +89,10 @@ error_t	sh_heredoc_write(t_sh_cmd *cmd, char *file, int mode)
 	return (ERR_NONE);
 }
 
-error_t	sh_output_load(t_sh_cmd *cmd)
+t_error_t	sh_output_load(t_sh_cmd *cmd)
 {
-	t_sh_redir	*tmp;
-	error_t		op;
+	t_sh_redir		*tmp;
+	t_error_t		op;
 
 	tmp = cmd->redirects;
 	op = ERR_NONE;
@@ -115,10 +115,10 @@ error_t	sh_output_load(t_sh_cmd *cmd)
 	return (cmd->output_fd == FILE_ERROR && access(tmp->target, R_OK));
 }
 
-error_t	sh_input_load(t_sh_cmd *cmd, int *hd_last)
+t_error_t	sh_input_load(t_sh_cmd *cmd, int *hd_last)
 {
-	t_sh_redir	*tmp;
-	error_t		op;
+	t_sh_redir		*tmp;
+	t_error_t		op;
 
 	if (!cmd->redirects)
 		return (ERR_NONE);

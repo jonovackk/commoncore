@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:08:24 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:56:00 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 11:56:18 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,18 @@ char	*sh_double_quote_state(char *addr, int type)
 
 char	*sh_heredoc_state(char *addr, int type)
 {
-	static char	*sh_hd_filename = NULL;
-	static char	*sh_hd_delimiter = NULL;
-	static int	sh_hd_fd = -1;
+	static char	*sh_hd_filename;
+	static char	*sh_hd_delimiter;
+	static int	sh_hd_fd;
 
-	if (!sh_hd_filename || (addr && type == 0))
+	sh_hd_filename = NULL;
+	sh_hd_delimiter = NULL;
+	sh_hd_fd = -1;
+	if (type == 0 && (addr || !sh_hd_filename))
 		sh_hd_filename = addr;
-	else if ((!sh_hd_delimiter || (addr && type == 1)))
+	else if (type == 1 && (addr || !sh_hd_delimiter))
 		sh_hd_delimiter = addr;
-	else if ((sh_hd_fd = -1 || (addr && type == 2)))
+	else if (type == 2 && addr)
 		sh_hd_fd = *(int *)addr;
 	if (type == 0)
 		return (sh_hd_filename);

@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:08:09 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 16:46:51 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:04:13 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 extern int	g_shell_exit_status;
 
 void	sh_execute_command_multiplex(t_sh_node *node, int *node_fd,
-		t_sh_exec *executor, exec_t execution_mode)
+		t_sh_exec *executor, t_exec_t execution_mode)
 {
 	if (!executor || !node || !node_fd)
 		return ;
@@ -40,7 +40,7 @@ void	sh_execute_command_multiplex(t_sh_node *node, int *node_fd,
 }
 
 void	sh_wait_pipeline_processes(t_sh_pid *initial_pid, t_sh_exec *executor,
-		exec_t execution_mode)
+		t_exec_t execution_mode)
 {
 	t_sh_pid	*waiting_process;
 	int			process_exit_code;
@@ -48,9 +48,11 @@ void	sh_wait_pipeline_processes(t_sh_pid *initial_pid, t_sh_exec *executor,
 	t_sh_pipe	*pipe_node;
 
 	is_first_process = 0;
-	while ((pipe_node = sh_pipe_pop(&executor->active_pipes)) != NULL)
+	pipe_node = sh_pipe_pop(&executor->active_pipes);
+	while (pipe_node != NULL)
 	{
 		sh_delete_pipe(pipe_node);
+		pipe_node = sh_pipe_pop(&executor->active_pipes);
 	}
 	sh_delete_pipe(sh_pipe_pop(&(executor->active_pipes)));
 	while (execution_mode == EXEC_WAIT && executor
@@ -66,7 +68,7 @@ void	sh_wait_pipeline_processes(t_sh_pid *initial_pid, t_sh_exec *executor,
 }
 
 void	sh_execute_pipeline(t_sh_node *node, int *node_fd, t_sh_exec *executor,
-		exec_t execution_mode)
+		t_exec_t execution_mode)
 {
 	int			pipe_fd[2];
 	t_sh_pid	*initial_pid;
@@ -94,7 +96,7 @@ void	sh_execute_pipeline(t_sh_node *node, int *node_fd, t_sh_exec *executor,
 		sh_wait_pipeline_processes(initial_pid, executor, execution_mode);
 }
 
-void	sh_and_exec(t_sh_node *node, int *node_fd, t_sh_exec *ex, exec_t mode)
+void	sh_and_exec(t_sh_node *node, int *node_fd, t_sh_exec *ex, t_exec_t mode)
 {
 	pid_t	child;
 	int		err_code;
@@ -119,7 +121,7 @@ void	sh_and_exec(t_sh_node *node, int *node_fd, t_sh_exec *ex, exec_t mode)
 	}
 }
 
-void	sh_or_exec(t_sh_node *node, int *node_fd, t_sh_exec *ex, exec_t mode)
+void	sh_or_exec(t_sh_node *node, int *node_fd, t_sh_exec *ex, t_exec_t mode)
 {
 	pid_t	child;
 	int		err_code;

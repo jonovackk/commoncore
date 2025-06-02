@@ -6,7 +6,7 @@
 /*   By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 15:07:35 by jnovack           #+#    #+#             */
-/*   Updated: 2025/05/30 15:59:07 by jnovack          ###   ########.fr       */
+/*   Updated: 2025/06/02 12:01:56 by jnovack          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	sh_refresh_executable(t_sh_cmd *cmd)
 		cmd->executable = sh_find_path(*cmd->arguments, *(cmd->environment));
 }
 
-error_t	sh_prepare_cmd(t_sh_cmd *cmd)
+t_error_t	sh_prepare_cmd(t_sh_cmd *cmd)
 {
 	char	**tmp;
 
@@ -67,9 +67,9 @@ error_t	sh_prepare_cmd(t_sh_cmd *cmd)
 	return (ERR_NONE);
 }
 
-error_t	sh_traverse_heredocs(t_sh_node *node, int *heredoc)
+t_error_t	sh_traverse_heredocs(t_sh_node *node, int *heredoc)
 {
-	error_t	error;
+	t_error_t	error;
 
 	if (!node)
 		return (ERR_ERRORS);
