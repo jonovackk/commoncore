@@ -47,7 +47,7 @@ It interprets and executes user commands, replicating core features of well-know
 ## Authors
 
 - [jnovack]
-- (https://github.com/BMarques21) [brunmart] 
+- [brunmart](https://github.com/BMarques21)  
 
 Project developed as part of the 42 Network curriculum at **42 Luxembourg**.
 
