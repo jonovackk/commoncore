@@ -6,67 +6,67 @@
 #    By: jnovack <jnovack@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/20 16:01:18 by jnovack           #+#    #+#              #
-#    Updated: 2024/10/29 10:18:21 by jnovack          ###   ########.fr        #
+#    Updated: 2025/01/21 17:52:10 by jnovack          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
-STR_SRCS = ft_strlen.c \
-	   ft_strlcpy.c \
-	   ft_strlcat.c \
-	   ft_strchr.c \
-	   ft_strrchr.c \
-	   ft_strncmp.c \
-	   ft_strnstr.c \
-	   ft_strdup.c \
-	   ft_substr.c \
-	   ft_strjoin.c \
-	   ft_strtrim.c \
-	   ft_split.c \
-	   ft_strmapi.c \
-	   ft_striteri.c
-	   
-MEM_SRCS = ft_bzero.c \
-           ft_memcpy.c \
-           ft_memset.c \
-           ft_memmove.c \
-           ft_memchr.c \
-           ft_memcmp.c \
-           ft_calloc.c
-           
-CHAR_SRCS = ft_isalnum.c \
-            ft_isalpha.c \
-            ft_isascii.c \
-            ft_isdigit.c \
-            ft_isprint.c \
-            ft_toupper.c \
-            ft_tolower.c
-            
-UTIL_SRCS = ft_atoi.c \
-	    ft_itoa.c
-	    
-FD_SRCS = ft_putchar_fd.c \
-          ft_putstr_fd.c \
-          ft_putendl_fd.c \
-          ft_putnbr_fd.c
-          
-SRCS = $(STR_SRCS) $(MEM_SRCS) $(CHAR_SRCS) $(UTIL_SRCS) $(FD_SRCS)
-OBJS = $(SRCS:.c=.o)
+SOURCES = sources/conv_functions/ft_atoi.c \
+	sources/conv_functions/ft_itoa.c \
+	sources/conv_functions/ft_itoa.c \
+	sources/desc_file/ft_putchar_fd.c \
+	sources/desc_file/ft_putendl_fd.c \
+	sources/desc_file/ft_putnbr_fd.c \
+	sources/desc_file/ft_putstr_fd.c \
+	sources/mnpl_char/ft_isalnum.c \
+	sources/mnpl_char/ft_isalpha.c \
+	sources/mnpl_char/ft_isascii.c \
+	sources/mnpl_char/ft_isdigit.c \
+	sources/mnpl_char/ft_isprint.c \
+	sources/mnpl_char/ft_putchar.c \
+	sources/mnpl_char/ft_putnbr.c \
+	sources/mnpl_char/ft_tolower.c \
+	sources/mnpl_char/ft_toupper.c \
+	sources/mnpl_memory/ft_bzero.c \
+	sources/mnpl_memory/ft_calloc.c \
+	sources/mnpl_memory/ft_memchr.c \
+	sources/mnpl_memory/ft_memcmp.c \
+	sources/mnpl_memory/ft_memcpy.c \
+	sources/mnpl_memory/ft_memmove.c \
+	sources/mnpl_memory/ft_memset.c \
+	sources/mnpl_memory/ft_strdup.c \
+	sources/mnpl_str/ft_puthex.c \
+	sources/mnpl_str/ft_putptr.c \
+	sources/mnpl_str/ft_putstr.c \
+	sources/mnpl_str/ft_split.c \
+	sources/mnpl_str/ft_strchr.c \
+	sources/mnpl_str/ft_striteri.c \
+	sources/mnpl_str/ft_strjoin.c \
+	sources/mnpl_str/ft_strlcat.c \
+	sources/mnpl_str/ft_strlcpy.c \
+	sources/mnpl_str/ft_strlen.c \
+	sources/mnpl_str/ft_strmapi.c \
+	sources/mnpl_str/ft_strncmp.c \
+	sources/mnpl_str/ft_strnstr.c \
+	sources/mnpl_str/ft_strrchr.c \
+	sources/mnpl_str/ft_strtrim.c \
+	sources/mnpl_str/ft_substr.c \
+	sources/get_next_line/get_next_line.c \
+	sources/ft_printf/ft_printf.c \
+	sources/ft_printf/ft_print_char.c \
+	sources/ft_printf/ft_print_hex.c \
+	sources/ft_printf/ft_print_char.c \
+	sources/ft_printf/ft_print_num_unsigned.c \
+	sources/ft_printf/ft_print_ptr.c \
+	sources/ft_printf/ft_print_str.c \
+	sources/ft_printf/ft_print_num_base.c \
+	sources/ft_printf/ft_print_num.c
+
+OBJS = $(SOURCES:.c=.o)
 
 
-BONUS_SRCS = ft_lstnew_bonus.c \
-             ft_lstadd_front_bonus.c \
-             ft_lstsize_bonus.c \
-             ft_lstlast_bonus.c \
-             ft_lstadd_back_bonus.c \
-             ft_lstdelone_bonus.c \
-             ft_lstclear_bonus.c \
-             ft_lstiter_bonus.c \
-             ft_lstmap_bonus.c
-           
-BONUS_OBJS = $(BONUS_SRCS:.c=.o)
 
-INCS    = ./
+INCS    = ./includes
 NAME    = libft.a
 LIBC    = ar rc
 CC      = cc
@@ -74,7 +74,7 @@ CFLAGS  = -Wall -Werror -Wextra -O3
 RM      = rm -f
 
 LIGHT_BLUE = \033[38;2;173;216;230m
-RESET	   = \033[0m
+RESET      = \033[0m
 
 .c.o:
 	@echo "$(LIGHT_BLUE)Compiling $<...$(RESET)"
@@ -87,19 +87,14 @@ $(NAME): $(OBJS)
 
 all: $(NAME)
 
-# Bonus target, includes additional linked list functions
-bonus: $(OBJS) $(BONUS_OBJS)
-	@echo "$(LIGHT_BLUE)Adding bonus files to $(NAME)...$(RESET)"
-	$(LIBC) $(NAME) $(OBJS) $(BONUS_OBJS)
-
 so:
 	@echo "$(LIGHT_BLUE)Creating shared library libft.so...$(RESET)"
-	$(CC) -nostartfiles -fPIC ${CFLAGS} ${SRCS}
-	$(CC) -nostartfiles -shared -o libft.so ${OBJS} $(BONUS_OBJS)
+	$(CC) -nostartfiles -fPIC ${CFLAGS} ${SOURCES}
+	$(CC) -nostartfiles -shared -o libft.so ${OBJS}
 
 clean:
 	@echo "$(LIGHT_BLUE)Cleaning up object files...$(RESET)"
-	$(RM) $(OBJS) $(BONUS_OBJS)
+	$(RM) $(OBJS)
 
 fclean: clean
 	@echo "$(LIGHT_BLUE)Removing $(NAME) and libft.so...$(RESET)"
@@ -108,5 +103,5 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all bonus so clean fclean re
-	   
+.PHONY: all so clean fclean re
+
